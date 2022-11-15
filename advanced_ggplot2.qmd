@@ -1,7 +1,10 @@
 ---
 title: "Advanced ggplot2"
 author: "Charlotte Soneson"
-format: html
+date: "`r Sys.Date()`"
+format: 
+    html:
+        toc: true
 ---
 
 # Load packages
@@ -9,6 +12,303 @@ format: html
 ```{r}
 suppressPackageStartupMessages({
     library(ggplot2)
+    library(ggforce)
+    library(ggalt)
+    library(ggridges)
+    library(GGally)
+    library(patchwork)
+    library(cowplot)
+    library(scales)
+    library(forcats)
+    library(plotly)
+    library(ggiraph)
+    library(ggsignif)
+    library(ggstatsplot)
+    library(gghighlight)
+    library(ggrepel)
+    library(ggtext)
+    library(ggpackets)
+    library(RColorBrewer)
+    library(circlize)
+    library(sessioninfo)
+    library(dplyr)
+    library(fueleconomy)
+    library(tidyr)
 })
+```
+
+# Quick look at the data
+
+```{r}
+(df <- vehicles %>%
+     dplyr::filter(year >= 2000))
+```
+
+# Start with a basic plot
+
+```{r}
+ggplot(df, aes(x = fuel)) + 
+    geom_bar() + 
+    coord_flip()
+```
+
+# Changing order of factor levels
+
+Use the `forcats` package.
+
+## Order by frequency - `fct_infreq`
+
+```{r}
+ggplot(df, aes(x = fct_infreq(fuel))) + 
+    geom_bar() + 
+    coord_flip()
+```
+
+## Order by the order they first appear in the data - `fct_inorder`
+
+```{r}
+ggplot(df, aes(x = fct_inorder(fuel))) + 
+    geom_bar() + 
+    coord_flip()
+```
+
+## Lump together rare factors - `fct_lump_n`
+
+```{r}
+ggplot(df, aes(x = fct_infreq(fct_lump_n(fuel, n = 3, other_level = "Other")))) + 
+    geom_bar() + 
+    coord_flip()
+```
+
+## Reorder one factor by the values of another - `fct_reorder`
+
+I use this e.g. to plot library sizes of samples, ordered by experiment. 
+
+```{r}
+ggplot(df %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
+       aes(x = fct_reorder(class, mean_hwy), y = mean_hwy)) + 
+    geom_col() + 
+    coord_flip()
+
+ggplot(df %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
+       aes(x = fct_reorder(class, mean_hwy), y = mean_hwy)) + 
+    geom_point() + 
+    coord_flip()
+```
+
+# Faceting
+
+## `facet_wrap` 
+
+```{r}
+ggplot(df, aes(x = hwy, y = cty)) +
+    geom_point() + 
+    facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"))
+```
+
+```{r}
+ggplot(df, aes(x = hwy, y = cty)) +
+    geom_point() + 
+    facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               scales = "free")
+```
+
+## `facet_grid`
+
+```{r}
+ggplot(df, aes(x = hwy, y = cty)) +
+    geom_point() + 
+    facet_grid(fct_lump_n(class, n = 3) ~ fct_lump_n(fuel, n = 3, other_level = "Other"))
+```
+
+## Showing all the data as 'background' in each facet
+
+```{r}
+ggplot(df, aes(x = hwy, y = cty)) +
+    geom_point(data = transform(df, fuel = NULL), colour = "grey80") +
+    geom_point() + 
+    facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               scales = "free")
+```
+
+
+## Facetting bar plots with different numbers of categories in each facet
+
+```{r, fig.width = 10}
+## facet_wrap with scales = "fixed" -> leave a missing bar for empty categories
+ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+    geom_bar() + 
+    facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               scales = "fixed", nrow = 1)
+
+## facet_wrap with scales = "free" -> don't leave empty space, 
+## but bars will be of different width
+ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+    geom_bar() + 
+    facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               scales = "free", nrow = 1)
+
+## facet_grid lets you adjust the space allocated to each facet, but will keep 
+## the y-axis the same for all panels
+ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+    geom_bar() + 
+    facet_grid(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               scales = "free", space = "free")
+
+## ggforce::facet_row lets you adjust the space allocated to each facet and use a 
+## free y-axis
+ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+    geom_bar() + 
+    facet_row(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               scales = "free", space = "free")
+```
+
+
+# More on bar plots (without faceting)
+
+```{r}
+## Default - stacked bar plot
+ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               fill = fct_lump_n(make, n = 3))) +
+    geom_bar()
+
+## Side-by-side bar plot (but bars have different widths)
+ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               fill = fct_lump_n(make, n = 3))) +
+    geom_bar(position = position_dodge())
+
+## Side-by-side bar plot with consistent width (but the same category 
+## will not always be in the same relative position)
+ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               fill = fct_lump_n(make, n = 3))) +
+    geom_bar(position = position_dodge2(preserve = "single"))
+
+## Side-by-side bar plot with consistent width and position
+ggplot(df %>% mutate(fuel = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+                     make = fct_lump_n(make, n = 3)) %>%
+           count(fuel, make) %>%
+           complete(fuel = unique(fuel), make = unique(make), 
+                    fill = list(n = 0)), 
+       aes(x = fuel, y = n, fill = make)) + 
+    geom_bar(stat = "identity", position = position_dodge2(preserve = "single"))
+```
+
+
+# Changing scales for axes
+
+```{r}
+## scales::percent will multiply by 100
+ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               fill = fct_lump_n(make, n = 3))) +
+    geom_bar(position = "fill") + 
+    scale_y_continuous(labels = scales::percent) + 
+    labs(y = "Percentage")
+
+## scales::percent_format has more arguments
+ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               fill = fct_lump_n(make, n = 3))) +
+    geom_bar(position = "fill") + 
+    scale_y_continuous(labels = scales::percent_format(scale = 100, accuracy = 0.01)) + 
+    labs(y = "Percentage")
+```
+
+# Interactive plots
+
+Be careful - these plots may get very big!
+
+```{r}
+## Turn a ggplot into an interactive plot with ggplotly
+ggplotly(
+    ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, 
+                                                   label = make)) +
+        geom_point(),
+    tooltip = c("label", "x", "y", "text")
+)
+```
+
+- `ggiraph`
+
+# Titles, subtitles and captions
+
+```{r}
+ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
+    geom_point() + 
+    labs(title = "This is the title", 
+         subtitle = "And a subtitle",
+         caption = "And the caption goes here",
+         x = "Highway fuel economy (mpg)",
+         y = "City fuel economy (mpg)")
+```
+
+Note that not all of these are compatible with interactive plots:
+
+```{r}
+ggplotly(
+    ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
+        geom_point() + 
+        labs(title = "This is the title", 
+             subtitle = "And a subtitle",
+             caption = "And the caption goes here",
+             x = "Highway fuel economy (mpg)",
+             y = "City fuel economy (mpg)")
+)
+```
+
+# Adding statistical information to plots
+
+- `ggsignif`, `ggstatsplot`
+
+# Adding text and annotation
+
+- `geomtextpath`
+- `ggforce` (annotate sets of points)
+- `ggtext`
+- `ggrepel`
+- `gghighlight` (highlight subset of lines for example)
+- `ggalt` (encircling points in scatter plot). Also `geom_mark_` geoms in `ggforce`
+- move legend inside plot
+- add number of values in bar plot
+
+# Specifying color palettes
+
+```{r}
+## One-sided gradient
+ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = cyl)) +
+    geom_point() + 
+    scale_color_gradient(low = "white", high = "darkblue")
+
+## Two-sided gradient
+ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+    geom_point() + 
+    scale_color_gradient2(low = "red", mid = "white", high = "darkblue", 
+                          midpoint = 0)
+```
+
+- `RColorBrewer`
+- discrete and continuous palettes, gradients
+- cap color range
+
+# Specifying your own theme
+
+- `ggpackets`
+
+# Combining plot panels
+
+- `patchwork`/`cowplot`
+- `get_legend()`
+- alignment of panels
+
+# Other material, sources for some of the material presented above
+
+- [https://uc-r.github.io/ggplot](https://uc-r.github.io/ggplot)
+- [https://exts.ggplot2.tidyverse.org/gallery/](https://exts.ggplot2.tidyverse.org/gallery/)
+- [https://www.youtube.com/watch?v=8ikFe82Mb1I&ab_channel=R-LadiesTunis](https://www.youtube.com/watch?v=8ikFe82Mb1I&ab_channel=R-LadiesTunis)
+- [https://stulp.gmw.rug.nl/ggplotworkshop/advancedggplot.html#showing-all-data-in-facets](https://stulp.gmw.rug.nl/ggplotworkshop/advancedggplot.html#showing-all-data-in-facets)
+- [https://stackoverflow.com/questions/61922380/preserve-location-of-missing-columns-in-combined-bar-plot](https://stackoverflow.com/questions/61922380/preserve-location-of-missing-columns-in-combined-bar-plot)
+
+# Session info
+
+```{r}
+sessioninfo::session_info()
 ```
 
