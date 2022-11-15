@@ -1,0 +1,14 @@
+---
+title: "Advanced ggplot2"
+author: "Charlotte Soneson"
+format: html
+---
+
+# Load packages
+
+```{r}
+suppressPackageStartupMessages({
+    library(ggplot2)
+})
+```
+
