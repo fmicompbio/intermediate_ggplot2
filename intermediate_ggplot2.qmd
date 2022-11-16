@@ -131,6 +131,27 @@ ggplot(df, aes(x = hwy, y = cty)) +
                scales = "free")
 ```
 
+```{r}
+## gghighlight
+ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
+       aes(x = hwy, y = cty)) +
+    geom_point(aes(color = fuel_lumped)) + 
+    gghighlight() + 
+    facet_wrap(~ fuel_lumped, scales = "free")
+
+ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
+       aes(x = hwy, y = cty)) +
+    geom_point(aes(color = fuel_lumped)) + 
+    gghighlight(fuel_lumped == "Premium")
+
+ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
+       aes(x = hwy, y = cty)) +
+    geom_point() + 
+    gghighlight(hwy - cty > 15 | ((abs(hwy - 60) < 10) & (abs(cty - 75) < 10)), 
+                label_key = make)
+```
+
+
 
 ## Facetting bar plots with different numbers of categories in each facet
 
@@ -260,12 +281,34 @@ ggplotly(
 
 # Adding text and annotation
 
+```{r}
+## ggforce
+ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
+    geom_point() + 
+    geom_mark_ellipse(aes(label = "Interesting points", 
+                          description = "These points are interesting",
+                          filter = (cty - hwy) > 1), 
+                      fill = "pink")
+
+## ggalt
+ggplot(iris, aes(x = Petal.Width, y = Sepal.Width, colour = Species)) +
+    geom_point() + 
+    geom_encircle(aes(group = Species))
+```
+
+```{r}
+## gghighlight
+ggplot(diamonds %>% group_by(carat, cut) %>% summarize(mean_price = mean(price)),
+       aes(x = carat, y = mean_price, color = cut)) +
+    geom_line() + 
+    gghighlight(cut %in% c("Good", "Ideal")) + 
+    facet_wrap(~ cut)
+```
+
+
 - `geomtextpath`
-- `ggforce` (annotate sets of points)
 - `ggtext`
 - `ggrepel`
-- `gghighlight` (highlight subset of lines for example)
-- `ggalt` (encircling points in scatter plot). Also `geom_mark_` geoms in `ggforce`
 - move legend inside plot
 - add number of values in bar plot
 
@@ -282,10 +325,43 @@ ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(c
     geom_point() + 
     scale_color_gradient2(low = "red", mid = "white", high = "darkblue", 
                           midpoint = 0)
+
+## viridis continuous colors
+## viridis_c - continuous
+## viridis_b - binned
+## viridis_d - discrete
+ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+    geom_point() + 
+    scale_color_viridis_c()
+
+## Manual colors
+ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               fill = fct_lump_n(make, n = 3))) +
+    geom_bar(position = "fill") + 
+    scale_fill_manual(values = c(BMW = "darkblue", Chevrolet = "red", 
+                                 Ford = "forestgreen", Other = "grey85"),
+                      name = "Make")
+
+## Colors from existing palettes
+## RColorBrewer palettes
+display.brewer.all()
+ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               fill = fct_lump_n(make, n = 3))) +
+    geom_bar(position = "fill") +
+    scale_fill_brewer(palette = "Set2", name = "Make")
+
+ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               fill = fct_lump_n(make, n = 3))) +
+    geom_bar(position = "fill") +
+    scale_fill_brewer(palette = "Greens", name = "Make")
+
+## 'viridis' colors
+ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               fill = fct_lump_n(make, n = 3))) +
+    geom_bar(position = "fill") +
+    scale_fill_viridis_d()
 ```
 
-- `RColorBrewer`
-- discrete and continuous palettes, gradients
 - cap color range
 
 # Specifying your own theme
@@ -294,9 +370,44 @@ ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(c
 
 # Combining plot panels
 
-- `patchwork`/`cowplot`
-- `get_legend()`
-- alignment of panels
+```{r}
+g1 <- ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+                     fill = fct_lump_n(make, n = 3))) +
+    geom_bar(position = "fill") +
+    scale_fill_brewer(palette = "Set2", name = "Make")
+g2 <- ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+    geom_point() + 
+    scale_color_gradient2(low = "red", mid = "white", high = "darkblue", 
+                          midpoint = 0)
+g3 <- ggplot(df %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
+             aes(x = fct_reorder(class, mean_hwy), y = mean_hwy)) + 
+    geom_point() + 
+    coord_flip()
+(g12 <- cowplot::plot_grid(g1, g2 + theme(legend.position = "none"),
+                           ncol = 1, labels = c("A", "B"), align = "v"))
+(g12 <- cowplot::plot_grid(g1, g2 + theme(legend.position = "none"),
+                           ncol = 1, labels = c("A", "B"), align = "v", axis = "lr"))
+cowplot::plot_grid(g12, g3, nrow = 1, labels = c("", "C"))
+```
+
+```{r}
+get_legend(g1)
+cowplot::plot_grid(g1 + theme(legend.position = "none"), 
+                   g1 + theme(legend.position = "none"), 
+                   get_legend(g1), 
+                   nrow = 1, rel_widths = c(1, 1, 0.4))
+```
+
+```{r}
+## patchwork
+g1 | g2
+g1 / g2 + theme(legend.position = "none")
+(g1 / g2) | g3
+```
+
+
+- shared title
+
 
 # Other material, sources for some of the material presented above
 
