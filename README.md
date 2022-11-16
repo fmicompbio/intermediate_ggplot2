@@ -1,3 +1,4 @@
-## Advanced ggplot2 workshop
+## Intermediate ggplot2 workshop
 
-This repository contains material for a workshop on advanced ggplot2 topics. 
+This repository contains material for a workshop on `ggplot2` topics that 
+go a bit beyond the basic plots. 
