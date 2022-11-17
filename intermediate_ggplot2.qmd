@@ -310,7 +310,7 @@ ggplot(diamonds %>% group_by(carat, cut) %>% summarize(mean_price = mean(price))
 - `ggtext`
 - `ggrepel`
 - move legend inside plot
-- add number of values in bar plot
+- add number of values in bar plot (https://r-graphics.org/recipe-bar-graph-labels)
 
 # Specifying color palettes
 
