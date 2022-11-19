@@ -436,6 +436,31 @@ ggplot(diamonds, aes(x = carat, y = depth, color = price)) +
 
 ```
 
+# Using `after_stat` (previously `..*..`)
+
+```{r}
+## Histogram...
+ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy)) +
+    geom_histogram(bins = 30)
+
+## ...is equivalent to
+ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(count))) +
+    geom_histogram(bins = 30)
+
+## To get density instead:
+ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(density))) +
+    geom_histogram(bins = 30)
+
+## In percentage
+ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(density))) +
+    geom_histogram(bins = 30) + 
+    scale_y_continuous(labels = scales::percent)
+
+## Other transformations - scale so that max height = 1
+ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(count/max(count)))) +
+    geom_histogram(bins = 30)
+```
+
 
 # Specifying your own theme
 
