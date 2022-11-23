@@ -589,6 +589,20 @@ cowplot::plot_grid(g1 + theme(legend.position = "none"),
                    nrow = 1, rel_widths = c(1, 1, 0.4))
 ```
 
+`cowplot` doesn't work directly with the output of `ggpairs`, for example:
+
+```{r, fig.width = 10, error = TRUE}
+gp <- ggpairs(df %>% dplyr::select(cty, hwy, cyl))
+cowplot::plot_grid(gp, g1)
+```
+
+However, it works like this:
+
+```{r, fig.width = 10}
+cowplot::plot_grid(ggmatrix_gtable(gp), g1)
+```
+
+
 ```{r}
 ## patchwork
 g1 | g2
