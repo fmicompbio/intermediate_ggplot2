@@ -48,7 +48,8 @@ suppressPackageStartupMessages({
 
 # A quick look at the data
 
-We will use two different data sets to illustrate the `ggplot2` usage. 
+We will use two different data sets to illustrate the tips and tricks in this 
+document. 
 The first one comes from the `fueleconomy` package, and provides fuel economy 
 data from the EPA between the years 1985 and 2015. 
 We subset the data to only the vehicles from the year 2000 or later. 
@@ -74,10 +75,17 @@ assign the theme-related parts of a `ggplot` call to a variable, and add
 this variable to all subsequent plots. 
 
 ```{r}
+## Define theme variable
 ggp <- theme_bw() + 
     theme(axis.text = element_text(size = 11),
           axis.title = element_text(size = 12),
           title = element_text(size = 13))
+
+## Use in any ggplot (take care to put it in the right position in the call
+## if the plot itself defines theme aspects)
+ggplot(df, aes(x = fuel)) + 
+    geom_bar() + coord_flip() + 
+    ggp
 ```
 
 It is also possible to set the default theme that is used for all plots in 
@@ -88,12 +96,18 @@ For example, to make `theme_bw()` the default theme, we could do:
 old <- theme_set(theme_bw())
 ```
 
-There are also functions in `ggplot2` for replacing specific elements of a theme, see 
+`ggplot2` also contains functions for replacing specific elements of a theme, see 
 [here](https://ggplot2.tidyverse.org/reference/theme_get.html) for an overview.
 
 # Changing order of factor levels with the `forcats` package
 
-## Start with a basic plot
+In this section, we will illustrate how to use the `forcats` package to reorder
+the levels of a factor "on the fly". Arguably, this is not strictly (gg)plot 
+related, and it can be applied to any factor; however, it is often useful to be 
+able to reorder factor levels to obtain the most informative graphical 
+representation of a data set. 
+
+We start with a basic bar plot.
 
 ```{r}
 ggplot(df, aes(x = fuel)) + 
@@ -102,9 +116,9 @@ ggplot(df, aes(x = fuel)) +
     ggp
 ```
 
-Use the `forcats` package.
+## Order by frequency
 
-## Order by frequency - `fct_infreq`
+The `fct_infreq` function will order the factor levels by their frequency. 
 
 ```{r}
 ggplot(df, aes(x = fct_infreq(fuel))) + 
@@ -113,7 +127,10 @@ ggplot(df, aes(x = fct_infreq(fuel))) +
     ggp
 ```
 
-## Order by the order they first appear in the data - `fct_inorder`
+## Order by their first appearance in the data
+
+The `fct_inorder` function will order the factor levels by the order they 
+appear in the data set. 
 
 ```{r}
 ggplot(df, aes(x = fct_inorder(fuel))) + 
@@ -122,7 +139,13 @@ ggplot(df, aes(x = fct_inorder(fuel))) +
     ggp
 ```
 
-## Lump together rare factors - `fct_lump_n`
+## Lump together rare factor levels
+
+Sometimes we have a large number of factor levels, many of which are very rare. 
+The [`fct_lump_*`](https://forcats.tidyverse.org/reference/fct_lump.html) set
+of functions can be used to group together rare levels into an "Other" category.
+Here we illustrate the use of the `fct_lump_n` function, which lumps 
+together all levels except for the `n` most frequent ones.
 
 ```{r}
 ggplot(df, aes(x = fct_infreq(fct_lump_n(fuel, n = 3, other_level = "Other")))) + 
@@ -131,9 +154,12 @@ ggplot(df, aes(x = fct_infreq(fct_lump_n(fuel, n = 3, other_level = "Other")))) 
     ggp
 ```
 
-## Reorder one factor by the values of another - `fct_reorder`
+## Reorder one factor by the values of another variable
 
-I use this e.g. to plot library sizes of samples, ordered by experiment. 
+The `fct_reorder` function can be used to reorder the levels of a factor by 
+the value of another variable. 
+
+<!-- For example, to plot library sizes of samples, ordered by experiment.-->
 
 ```{r}
 ggplot(df %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
