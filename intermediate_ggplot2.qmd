@@ -355,7 +355,7 @@ displayed side-by-side in a single panel.
 The default layout of a bar plot where each bar is further split by a 
 variable is to stack the components on top of each other: 
 
-```{r}
+```{r, fig.width = 10}
 ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar() + 
@@ -367,7 +367,7 @@ We can also get the bars side-by-side by setting the `position` argument
 However, if there are different numbers of subcategories, the bars will have 
 different widths. 
 
-```{r}
+```{r, fig.width = 10}
 ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = position_dodge()) + 
@@ -380,7 +380,7 @@ However, the categories will be centered for each value on the x-axis,
 which means that the same bar will not always appear in the same relative 
 position.
 
-```{r}
+```{r, fig.width = 10}
 ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = position_dodge2(preserve = "single")) + 
@@ -393,7 +393,7 @@ first summarize the data, making sure to represent the empty categories with
 a count of zero, and then using the code in the previous chunk to preserve 
 the widths of the bars.
 
-```{r}
+```{r, fig.width = 10}
 ## Side-by-side bar plot with consistent width and position
 ggplot(df %>% mutate(fuel = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                      make = fct_lump_n(make, n = 3)) %>%
