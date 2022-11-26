@@ -79,6 +79,7 @@ this variable to all subsequent plots.
 ggp <- theme_bw() + 
     theme(axis.text = element_text(size = 11),
           axis.title = element_text(size = 12),
+          strip.text = element_text(size = 12),
           title = element_text(size = 13))
 
 ## Use in any ggplot (take care to put it in the right position in the call
@@ -177,14 +178,36 @@ ggplot(df %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)),
 
 # Faceting
 
+Faceting splits a plot into several panels according to the value of a given 
+variable.
+There are several faceting function in `ggplot2`, and additional ones 
+provided in extension packages to address missing functionality. 
+
 ## `facet_wrap` 
 
+The `facet_wrap` function wraps a sequence of panels into a 2-dimensional 
+layout. 
+We can set the number of rows or columns to split the panels over.
+
 ```{r}
+## Default
 ggplot(df, aes(x = hwy, y = cty)) +
     geom_point() + 
     facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other")) + 
     ggp
+
+## Set number of rows
+ggplot(df, aes(x = hwy, y = cty)) +
+    geom_point() + 
+    facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), nrow = 1) + 
+    ggp
 ```
+
+By default, the x- and y-axes are shared between the panels. 
+The `scales` argument can be used to set either or both of them to be "free" 
+(i.e., panel-specific). 
+Setting `scales = "free"` decouples both the x- and y-axes, setting it to 
+`"free_x"` or `"free_y"` decouples only one of the axes. 
 
 ```{r}
 ggplot(df, aes(x = hwy, y = cty)) +
@@ -196,14 +219,88 @@ ggplot(df, aes(x = hwy, y = cty)) +
 
 ## `facet_grid`
 
-```{r}
+The `facet_grid` function places the set of panels in a matrix layout, where 
+each dimension is determined by a given variable. 
+It is typically most useful when we want to stratify by two discrete variables. 
+
+```{r, fig.width = 10, fig.height = 10}
 ggplot(df, aes(x = hwy, y = cty)) +
     geom_point() + 
-    facet_grid(fct_lump_n(class, n = 3) ~ fct_lump_n(fuel, n = 3, other_level = "Other")) + 
+    facet_grid(fct_lump_n(class, n = 3) ~ 
+                   fct_lump_n(fuel, n = 3, other_level = "Other")) + 
+    ggp
+```
+
+We can set `scales = "free"` also here, but note that it will affect the 
+entire rows/columns in the same way (i.e., panels are not completely 
+decoupled).
+
+```{r, fig.width = 10, fig.height = 10}
+ggplot(df, aes(x = hwy, y = cty)) +
+    geom_point() + 
+    facet_grid(fct_lump_n(class, n = 3) ~ 
+                   fct_lump_n(fuel, n = 3, other_level = "Other"),
+               scales = "free") + 
+    ggp
+```
+
+## Faceting bar plots with different numbers of categories in each facet
+
+Faceting with bar plots may require extra attention, if not all facets 
+contain the same set of categories. 
+
+Using `facet_wrap` with `scales = "fixed"` leaves a missing bar for empty 
+categories. 
+
+```{r, fig.width = 10}
+ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+    geom_bar() + 
+    facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               scales = "fixed", nrow = 1) + 
+    ggp
+```
+
+Using `facet_wrap` with scales = "free" doesn't leave empty space, but the 
+bars are of different width. 
+
+```{r, fig.width = 10}
+ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+    geom_bar() + 
+    facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               scales = "free", nrow = 1) + 
+    ggp
+```
+
+The `facet_grid` function lets us adjust the space allocated to each facet, 
+in order to keep the bar widths the same but not leave empty space for missing
+categories, but keeps the y-axis the same across the panels. 
+
+```{r, fig.width = 10}
+ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+    geom_bar() + 
+    facet_grid(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               scales = "free", space = "free") + 
+    ggp
+```
+
+Finally, the `facet_row` function from the `ggforce` package lets us adjust 
+the space allocated to each facet and at the same time use a free y-axis.
+
+```{r, fig.width = 10}
+ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+    geom_bar() + 
+    facet_row(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
+               scales = "free", space = "free") + 
     ggp
 ```
 
 ## Showing all the data as 'background' in each facet
+
+Sometimes we would like to show all the data as the "background" in each 
+facet, while highlighting the points corresponding to the specific facet. 
+This can be achieved in several ways. 
+A neat trick is to add an additional layer using a modified data set where the 
+faceting variable is removed:
 
 ```{r}
 ggplot(df, aes(x = hwy, y = cty)) +
@@ -214,89 +311,89 @@ ggplot(df, aes(x = hwy, y = cty)) +
     ggp
 ```
 
+Another option is to use the `gghighlight` package. 
+The package can be used to highlight points in a single panel:
+
 ```{r}
-## gghighlight
+ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
+       aes(x = hwy, y = cty)) +
+    geom_point(aes(color = fuel_lumped)) + 
+    gghighlight(fuel_lumped == "Premium") + 
+    ggp
+```
+
+Or to highlight all points, and additionally facet:
+
+```{r}
 ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
        aes(x = hwy, y = cty)) +
     geom_point(aes(color = fuel_lumped)) + 
     gghighlight() + 
     facet_wrap(~ fuel_lumped, scales = "free") + 
     ggp
+```
 
-ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
-       aes(x = hwy, y = cty)) +
-    geom_point(aes(color = fuel_lumped)) + 
-    gghighlight(fuel_lumped == "Premium") + 
-    ggp
+If the number of highlighted points is not too large, `gghighlight` will add 
+a label for each point. 
 
+```{r}
 ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
        aes(x = hwy, y = cty)) +
     geom_point() + 
     gghighlight(hwy - cty > 15 | ((abs(hwy - 60) < 10) & (abs(cty - 75) < 10)), 
-                label_key = make) + 
+                label_key = make, max_highlight = 25) + 
     ggp
 ```
 
 
+# Adjusting widths of bars in bar plots
 
-## Facetting bar plots with different numbers of categories in each facet
+We saw above how to adjust the widths of panels in facetted bar plots. 
+Here, we will instead see how to adjust the widths of individual bars, when 
+displayed side-by-side in a single panel. 
 
-```{r, fig.width = 10}
-## facet_wrap with scales = "fixed" -> leave a missing bar for empty categories
-ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
-    geom_bar() + 
-    facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
-               scales = "fixed", nrow = 1) + 
-    ggp
-
-## facet_wrap with scales = "free" -> don't leave empty space, 
-## but bars will be of different width
-ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
-    geom_bar() + 
-    facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
-               scales = "free", nrow = 1) + 
-    ggp
-
-## facet_grid lets you adjust the space allocated to each facet, but will keep 
-## the y-axis the same for all panels
-ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
-    geom_bar() + 
-    facet_grid(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
-               scales = "free", space = "free") + 
-    ggp
-
-## ggforce::facet_row lets you adjust the space allocated to each facet and use a 
-## free y-axis
-ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
-    geom_bar() + 
-    facet_row(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
-               scales = "free", space = "free") + 
-    ggp
-```
-
-
-# More on bar plots (without faceting)
+The default layout of a bar plot where each bar is further split by a 
+variable is to stack the components on top of each other: 
 
 ```{r}
-## Default - stacked bar plot
 ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar() + 
     ggp
+```
 
-## Side-by-side bar plot (but bars have different widths)
+We can also get the bars side-by-side by setting the `position` argument 
+(either `position = "dodge"` or `position = position_dodge()`). 
+However, if there are different numbers of subcategories, the bars will have 
+different widths. 
+
+```{r}
 ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = position_dodge()) + 
     ggp
+```
 
-## Side-by-side bar plot with consistent width (but the same category 
-## will not always be in the same relative position)
+We can use the `position_dodge2()` function to preserve the widths of the 
+bars. 
+However, the categories will be centered for each value on the x-axis, 
+which means that the same bar will not always appear in the same relative 
+position.
+
+```{r}
 ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = position_dodge2(preserve = "single")) + 
     ggp
+```
 
+In order to keep the widths of the bars and at the same time place them in 
+consistent relative positions for each value on the x-axis, one way is to 
+first summarize the data, making sure to represent the empty categories with 
+a count of zero, and then using the code in the previous chunk to preserve 
+the widths of the bars.
+
+```{r}
 ## Side-by-side bar plot with consistent width and position
 ggplot(df %>% mutate(fuel = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                      make = fct_lump_n(make, n = 3)) %>%
