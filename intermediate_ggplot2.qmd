@@ -408,10 +408,17 @@ ggplot(df %>% mutate(fuel = fct_lump_n(fuel, n = 3, other_level = "Other"),
 
 # Changing scales for axes
 
+In this section, we illustrate how change the axis ranges or tick labels of our 
+plots from the default values. 
+
 ## Axes with percent (%) values
 
-```{r}
-## scales::percent will multiply by 100
+In some cases the displayed values are fractions, that we would like to 
+express instead as percentages. 
+This can be achieved using the `scales` package:
+
+```{r, fig.width = 9}
+## scales::percent will multiply the values by 100 and add a % sign
 ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") + 
@@ -430,23 +437,40 @@ ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"),
 
 ## Limit axis range
 
+`ggplot` provides several ways to limit the range of the axes, and the effect 
+on the plot will depend on which approach is chosen. 
+More specifically, the `xlim()` and `ylim()` functions will replace all 
+values that are out of range by NA, while e.g. `coord_cartesian(xlim = ...)`
+keeps all the data for any calculations, and just adjusts the displayed range.
+In addition to appearance, the distinction is important e.g. when calculating 
+summary statistics, smoothing curves etc from the data. 
+
 ```{r}
-## xlim() + ylim() will replace out-of-range data by NA
+## xlim()/ylim() will replace out-of-range data by NA
 ggplot(df, aes(x = hwy, y = cty)) +
     geom_point(size = 8, shape = 1) +
-    xlim(11, 55) + 
+    xlim(11, 59) + 
+    geom_smooth() + 
     ggp
 
 ## coord_cartesian() just sets the displayed range
 ggplot(df, aes(x = hwy, y = cty)) +
     geom_point(size = 8, shape = 1) +
     coord_cartesian(xlim = c(11, 59)) + 
+    geom_smooth() + 
     ggp
 ```
 
 # Interactive plots
 
-Be careful - these plots may get very big!
+Interactive plots can be very helpful for exploratory purposes, and can 
+be directly embedded in R Markdown or Quarto reports. 
+However, it is worth noting that they do inflate the size of the report 
+(sometimes dramatically, if the number of points is very large).
+Here we will illustrate two approaches to making interactive "`ggplot`-like" 
+graphics. 
+First, we use the `ggplotly` function from the `plotly` package, which can be 
+used to turn a `ggplot` object into an interactive plot. 
 
 ```{r}
 ## Turn a ggplot into an interactive plot with ggplotly
@@ -458,6 +482,9 @@ ggplotly(
     tooltip = c("label", "x", "y", "text")
 )
 ```
+
+Note that `plotly` can also be used to directly generate advanced interactive 
+plots, without the intermediate `ggplot` object. 
 
 - `ggiraph`
 
