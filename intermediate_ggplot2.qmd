@@ -424,7 +424,9 @@ A more elegant solution is provided by the `ggrastr` package, that allows to
 raster just the problematic layer, while keeping the remaining layers as vectors.
 
 ```{r, fig.width=9}
-.get_pdf_filesize_kb <- function(plotobj) {
+get_pdf_filesize_kb <- function(plotobj) {
+    # helper function that returns the size of a plot
+    # when saved to a pdf file in kilo-bytes
     tf <- tempfile(fileext = ".pdf")
     ggsave(filename = tf, plot = plotobj, width = 8, height = 8)
     filesize <- file.info(tf)$size
@@ -434,23 +436,28 @@ raster just the problematic layer, while keeping the remaining layers as vectors
 
 ## normal plot with many elements
 p0 <- ggplot(diamonds, aes(carat, price)) +
-    geom_point(size = 0.2)
-.get_pdf_filesize_kb(p0)
+    geom_point(size = 0.2) +
+    ggp
+get_pdf_filesize_kb(p0)
 
 ## ggrastr::geom_*_rastr layers
 p1 <- ggplot(diamonds, aes(carat, price)) +
-    geom_point_rast(size = 0.2, raster.dpi = 200)
+    geom_point_rast(size = 0.2, raster.dpi = 200) +
+    ggp
 p1
-.get_pdf_filesize_kb(p1)
+get_pdf_filesize_kb(p1)
 
-# ggrastr::rasterise() wrapper
+## ggrastr::rasterise() wrapper
+## ... around the whole plot
 p2 <- rasterise(p1, layers = c("Point", "Title")) # raster all layers of given types
 .get_pdf_filesize_kb(p2)
 
+## ... around a specific layer
 p3 <- ggplot(diamonds, aes(carat, price)) +
-    rasterise(geom_point(size = 0.2), dpi = 200)
+    rasterise(geom_point(size = 0.2), dpi = 200) +
+    ggp
 p3
-.get_pdf_filesize_kb(p3)
+get_pdf_filesize_kb(p3)
 ```
 
 
