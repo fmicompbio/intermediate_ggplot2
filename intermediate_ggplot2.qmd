@@ -31,6 +31,7 @@ suppressPackageStartupMessages({
     library(ggrepel)
     library(ggtext)
     library(ggnewscale)
+    library(ggrastr)
     ## packages to combine multiple figures
     library(patchwork)
     library(cowplot)
@@ -348,7 +349,7 @@ ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other"
 
 # Adjusting widths of bars in bar plots
 
-We saw above how to adjust the widths of panels in facetted bar plots. 
+We saw above how to adjust the widths of panels in faceted bar plots. 
 Here, we will instead see how to adjust the widths of individual bars, when 
 displayed side-by-side in a single panel. 
 
@@ -403,6 +404,53 @@ ggplot(df %>% mutate(fuel = fct_lump_n(fuel, n = 3, other_level = "Other"),
        aes(x = fuel, y = n, fill = make)) + 
     geom_bar(stat = "identity", position = position_dodge2(preserve = "single")) + 
     ggp
+```
+
+
+# Rastering layers to limit the size of plots with many elements
+
+A common issue can be that for plots that contain many elements, such as a
+scatter plot for thousands of genes, the resulting plot file may get large
+and slow to display, especially when saved a vector-based graphics device like
+`pdf` or `svg`.
+
+A possible solution to this problem is to render the plot into a bitmap image
+by saving it to a bitmap-based graphics device like `png` or `jpeg`. However,
+a disadvantage of this approach is all elements will be rendered into that
+image and no adjustments to individual elements can be done afterwards, like for
+example increasing the text size of the axis titles.
+
+A more elegant solution is provided by the `ggrastr` package, that allows to
+raster just the problematic layer, while keeping the remaining layers as vectors.
+
+```{r, fig.width=9}
+.get_pdf_filesize_kb <- function(plotobj) {
+    tf <- tempfile(fileext = ".pdf")
+    ggsave(filename = tf, plot = plotobj, width = 8, height = 8)
+    filesize <- file.info(tf)$size
+    unlink(tf)
+    return(sprintf("%.1f kb", filesize / 1000))
+}
+
+## normal plot with many elements
+p0 <- ggplot(diamonds, aes(carat, price)) +
+    geom_point(size = 0.2)
+.get_pdf_filesize_kb(p0)
+
+## ggrastr::geom_*_rastr layers
+p1 <- ggplot(diamonds, aes(carat, price)) +
+    geom_point_rast(size = 0.2, raster.dpi = 200)
+p1
+.get_pdf_filesize_kb(p1)
+
+# ggrastr::rasterise() wrapper
+p2 <- rasterise(p1, layers = c("Point", "Title")) # raster all layers of given types
+.get_pdf_filesize_kb(p2)
+
+p3 <- ggplot(diamonds, aes(carat, price)) +
+    rasterise(geom_point(size = 0.2), dpi = 200)
+p3
+.get_pdf_filesize_kb(p3)
 ```
 
 
