@@ -409,8 +409,8 @@ ggplot(df %>% mutate(fuel = fct_lump_n(fuel, n = 3, other_level = "Other"),
 
 # Rastering layers to limit the size of plots with many elements
 
-A common issue can be that for plots that contain many elements, such as a
-scatter plot for thousands of genes, the resulting plot file may get large
+A common issue for plots that contain many elements, such as a scatter plot 
+with thousands of genes, is that the resulting plot file may get large
 and slow to display, especially when saved a vector-based graphics device like
 `pdf` or `svg`.
 
@@ -420,44 +420,57 @@ a disadvantage of this approach is all elements will be rendered into that
 image and no adjustments to individual elements can be done afterwards, like for
 example increasing the text size of the axis titles.
 
-A more elegant solution is provided by the `ggrastr` package, that allows to
-raster just the problematic layer, while keeping the remaining layers as vectors.
-
 ```{r, fig.width=9}
-get_pdf_filesize_kb <- function(plotobj) {
+get_filesize_kb <- function(plotobj, outformat = c("pdf", "png")) {
     # helper function that returns the size of a plot
-    # when saved to a pdf file in kilo-bytes
-    tf <- tempfile(fileext = ".pdf")
+    # when saved to a `outformat` file in kilo-bytes
+    outformat <- match.arg(outformat)
+    tf <- tempfile(fileext = paste0(".", outformat))
     ggsave(filename = tf, plot = plotobj, width = 8, height = 8)
     filesize <- file.info(tf)$size
     unlink(tf)
-    return(sprintf("%.1f kb", filesize / 1000))
+    cat(sprintf("%s-file of size %.1f kb\n", outformat, filesize / 1000))
+    return(invisible(filesize))
 }
 
 ## normal plot with many elements
 p0 <- ggplot(diamonds, aes(carat, price)) +
     geom_point(size = 0.2) +
     ggp
-get_pdf_filesize_kb(p0)
+get_filesize_kb(p0, "pdf")
+get_filesize_kb(p0, "png")
+```
 
+A more elegant solution is provided by the `ggrastr` package, that allows to
+raster just the problematic layer, while keeping the remaining layers as vectors,
+for example using the `geom_point_rast` function:
+
+```{r, fig.width=9}
 ## ggrastr::geom_*_rastr layers
 p1 <- ggplot(diamonds, aes(carat, price)) +
     geom_point_rast(size = 0.2, raster.dpi = 200) +
     ggp
 p1
-get_pdf_filesize_kb(p1)
+get_filesize_kb(p1, "pdf")
+```
 
+or by using `rasterise`, which can wrap any other layer or even whole plots,
+and automatically rasterize all layers of certain types (`layers` argument).
+The resolution of the raster images can be controlled with `dpi` (or `raster.dpi`
+above):
+
+```{r, fig.width=9}
 ## ggrastr::rasterise() wrapper
 ## ... around the whole plot
 p2 <- rasterise(p1, layers = c("Point", "Title")) # raster all layers of given types
-.get_pdf_filesize_kb(p2)
+get_filesize_kb(p2, "pdf")
 
 ## ... around a specific layer
 p3 <- ggplot(diamonds, aes(carat, price)) +
     rasterise(geom_point(size = 0.2), dpi = 200) +
     ggp
 p3
-get_pdf_filesize_kb(p3)
+get_filesize_kb(p3, "pdf")
 ```
 
 
@@ -556,7 +569,8 @@ ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
     ggp
 ```
 
-Note that not all of these are compatible with interactive plots:
+Note that not all of these are compatible with interactive plots (`subtitle`
+and `caption`):
 
 ```{r}
 ggplotly(
@@ -577,6 +591,10 @@ ggplotly(
 
 # Adding text and annotation
 
+Sometimes it is useful to outline a subset of the observations, enclosing
+them in an ellipse (`ggforce::geom_mark_circle`) or a polygon line
+(`ggalt::geom_encircle`):
+
 ```{r}
 ## ggforce
 ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
@@ -594,6 +612,9 @@ ggplot(iris, aes(x = Petal.Width, y = Sepal.Width, colour = Species)) +
     ggp
 ```
 
+The `gghighlight::gghighlight` function allows to highlight observations
+that fulfill specific criteria for most geoms:
+
 ```{r}
 ## gghighlight
 ggplot(diamonds %>% group_by(carat, cut) %>% summarize(mean_price = mean(price)),
@@ -604,13 +625,57 @@ ggplot(diamonds %>% group_by(carat, cut) %>% summarize(mean_price = mean(price))
     ggp
 ```
 
+`ggrepel` is useful to add non-overlapping labels to observations in a scatter
+plot. `geom_text_repel` just add's the text labels, `geom_label_repel` adds
+a filled background around each label:
+
+```{r}
+ggplot(df %>% dplyr::filter(year == 2005 & hwy > 30), aes(x = hwy, y = cty)) +
+    geom_point() + 
+    geom_text_repel(aes(label = model)) +
+    ggp
+
+ggplot(df %>% dplyr::filter(year == 2005 & hwy > 30), aes(x = hwy, y = cty)) +
+    geom_point() + 
+    geom_label_repel(aes(label = model)) +
+    ggp + theme(panel.background = element_rect(fill = "gray88"))
+```
 
 - `geomtextpath`
 - `ggtext`
-- `ggrepel`
 - add number of values in bar plot (https://r-graphics.org/recipe-bar-graph-labels)
 
 # Customizing legends
+
+`ggplot2` itself allows to control the placement of the legend in various ways.
+
+## Suppressing the legend
+
+`show.legend` can be used to not include a single layer in the legend. Other layers
+will be unaffected:
+
+```{r}
+ggplot(df, aes(hwy, cty, color = fuel)) +
+    geom_point(show.legend = FALSE) +
+    geom_point(inherit.aes = FALSE, data = df %>% dplyr::filter(make == "Ram"),
+               mapping = aes(hwy, cty, shape = model)) +
+    ggp
+```
+
+`theme(legend.position = "none")` completely suppresses the legend:
+
+```{r}
+ggplot(df, aes(hwy, cty, color = fuel)) +
+    geom_point() +
+    ggp +
+    theme(legend.position = "none")
+```
+
+## Legend position
+
+In addition to `"none"` which completely suppresses the legend,
+`theme(legend.position = "...")` also understands `"left"`, `"top"`, `"right"`
+and `"bottom"` to control the legend position (outside of the plot):
 
 ```{r}
 ## legend position (outside of plot)
@@ -620,21 +685,12 @@ ggplot(df, aes(hwy, cty, color = fuel)) +
     geom_point() +
     ggp + 
     theme(legend.position = "bottom")
+```
 
-## number of rows (discrete scales)
-ggplot(df, aes(hwy, cty, color = fuel)) +
-    geom_point() + 
-    ggp +
-    theme(legend.position = "bottom") +
-    guides(color = guide_legend(nrow = 5))
+In order to place the legend **inside** the plot, we can use numerical
+coordinates for `legend.position`:
 
-## override graphical parameters
-ggplot(diamonds, aes(carat, price, color = cut)) +
-    geom_point(size = 1, alpha = 0.1) + 
-    ggp +
-    theme(legend.position = "bottom") +
-    guides(color = guide_legend(override.aes = list(size = 4, alpha = 1)))
-
+```{r}
 ## move legend inside plot
 ## c(0,0) corresponds to the “bottom left” and
 ## c(1,1) corresponds to the “top right” position
@@ -643,6 +699,30 @@ ggplot(diamonds, aes(carat, price, color = cut)) +
     ggp +
     theme(legend.position = c(1, 0),
           legend.justification = c(1, 0)) +
+    guides(color = guide_legend(override.aes = list(size = 4, alpha = 1)))
+```
+
+## Customizing legend formatting
+
+`guides(... = guide_legend())` is useful to control or override legend
+formatting parameters, such as the number of rows or the transparency of plot
+symbols:
+
+```{r}
+## number of rows (discrete scales)
+ggplot(df, aes(hwy, cty, color = fuel)) +
+    geom_point() + 
+    ggp +
+    theme(legend.position = "bottom") +
+    guides(color = guide_legend(nrow = 5,
+                                title.position = "top",
+                                title.hjust = 0.5))
+
+## override graphical parameters
+ggplot(diamonds, aes(carat, price, color = cut)) +
+    geom_point(size = 1, alpha = 0.1) + 
+    ggp +
+    theme(legend.position = "bottom") +
     guides(color = guide_legend(override.aes = list(size = 4, alpha = 1)))
 ```
 
