@@ -68,7 +68,7 @@ data from the EPA between the years 1985 and 2015.
 We subset the data to only the vehicles from the year 2000 or later. 
 
 ```{r}
-(df <- vehicles %>%
+(vehicles <- vehicles %>%
      dplyr::filter(year >= 2000))
 ```
 
@@ -97,7 +97,7 @@ ggp <- theme_bw() +
 
 ## Use in any ggplot (take care to put it in the right position in the call
 ## if the plot itself defines theme aspects)
-ggplot(df, aes(x = fuel)) + 
+ggplot(vehicles, aes(x = fuel)) + 
     geom_bar() + coord_flip() + 
     ggp
 ```
@@ -124,7 +124,7 @@ representation of a data set.
 We start with a basic bar plot.
 
 ```{r}
-ggplot(df, aes(x = fuel)) + 
+ggplot(vehicles, aes(x = fuel)) + 
     geom_bar() + 
     coord_flip() + 
     ggp
@@ -135,7 +135,7 @@ ggplot(df, aes(x = fuel)) +
 The `fct_infreq` function will order the factor levels by their frequency. 
 
 ```{r}
-ggplot(df, aes(x = fct_infreq(fuel))) + 
+ggplot(vehicles, aes(x = fct_infreq(fuel))) + 
     geom_bar() + 
     coord_flip() + 
     ggp
@@ -147,7 +147,7 @@ The `fct_inorder` function will order the factor levels by the order they
 appear in the data set. 
 
 ```{r}
-ggplot(df, aes(x = fct_inorder(fuel))) + 
+ggplot(vehicles, aes(x = fct_inorder(fuel))) + 
     geom_bar() + 
     coord_flip() + 
     ggp
@@ -162,7 +162,8 @@ Here we illustrate the use of the `fct_lump_n` function, which lumps
 together all levels except for the `n` most frequent ones.
 
 ```{r}
-ggplot(df, aes(x = fct_infreq(fct_lump_n(fuel, n = 3, other_level = "Other")))) + 
+ggplot(vehicles, aes(x = fct_infreq(fct_lump_n(fuel, n = 3, 
+                                               other_level = "Other")))) + 
     geom_bar() + 
     coord_flip() + 
     ggp
@@ -176,13 +177,13 @@ the value of another variable.
 <!-- For example, to plot library sizes of samples, ordered by experiment.-->
 
 ```{r}
-ggplot(df %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
+ggplot(vehicles %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
        aes(x = fct_reorder(class, mean_hwy), y = mean_hwy)) + 
     geom_col() + 
     coord_flip() + 
     ggp
 
-ggplot(df %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
+ggplot(vehicles %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
        aes(x = fct_reorder(class, mean_hwy), y = mean_hwy)) + 
     geom_point() + 
     coord_flip() + 
@@ -204,13 +205,13 @@ We can set the number of rows or columns to split the panels over.
 
 ```{r}
 ## Default
-ggplot(df, aes(x = hwy, y = cty)) +
+ggplot(vehicles, aes(x = hwy, y = cty)) +
     geom_point() + 
     facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other")) + 
     ggp
 
 ## Set number of rows
-ggplot(df, aes(x = hwy, y = cty)) +
+ggplot(vehicles, aes(x = hwy, y = cty)) +
     geom_point() + 
     facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), nrow = 1) + 
     ggp
@@ -223,7 +224,7 @@ Setting `scales = "free"` decouples both the x- and y-axes, setting it to
 `"free_x"` or `"free_y"` decouples only one of the axes. 
 
 ```{r}
-ggplot(df, aes(x = hwy, y = cty)) +
+ggplot(vehicles, aes(x = hwy, y = cty)) +
     geom_point() + 
     facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
                scales = "free") + 
@@ -237,7 +238,7 @@ each dimension is determined by a given variable.
 It is typically most useful when we want to stratify by two discrete variables. 
 
 ```{r, fig.width = 10, fig.height = 10}
-ggplot(df, aes(x = hwy, y = cty)) +
+ggplot(vehicles, aes(x = hwy, y = cty)) +
     geom_point() + 
     facet_grid(fct_lump_n(class, n = 3) ~ 
                    fct_lump_n(fuel, n = 3, other_level = "Other")) + 
@@ -249,7 +250,7 @@ entire rows/columns in the same way (i.e., panels are not completely
 decoupled).
 
 ```{r, fig.width = 10, fig.height = 10}
-ggplot(df, aes(x = hwy, y = cty)) +
+ggplot(vehicles, aes(x = hwy, y = cty)) +
     geom_point() + 
     facet_grid(fct_lump_n(class, n = 3) ~ 
                    fct_lump_n(fuel, n = 3, other_level = "Other"),
@@ -266,7 +267,7 @@ Using `facet_wrap` with `scales = "fixed"` leaves a missing bar for empty
 categories. 
 
 ```{r, fig.width = 10}
-ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+ggplot(vehicles, aes(x = fct_lump_n(make, n = 3))) +
     geom_bar() + 
     facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
                scales = "fixed", nrow = 1) + 
@@ -277,7 +278,7 @@ Using `facet_wrap` with scales = "free" doesn't leave empty space, but the
 bars are of different width. 
 
 ```{r, fig.width = 10}
-ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+ggplot(vehicles, aes(x = fct_lump_n(make, n = 3))) +
     geom_bar() + 
     facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
                scales = "free", nrow = 1) + 
@@ -289,7 +290,7 @@ in order to keep the bar widths the same but not leave empty space for missing
 categories, but keeps the y-axis the same across the panels. 
 
 ```{r, fig.width = 10}
-ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+ggplot(vehicles, aes(x = fct_lump_n(make, n = 3))) +
     geom_bar() + 
     facet_grid(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
                scales = "free", space = "free") + 
@@ -300,7 +301,7 @@ Finally, the `facet_row` function from the `ggforce` package lets us adjust
 the space allocated to each facet and at the same time use a free y-axis.
 
 ```{r, fig.width = 10}
-ggplot(df, aes(x = fct_lump_n(make, n = 3))) +
+ggplot(vehicles, aes(x = fct_lump_n(make, n = 3))) +
     geom_bar() + 
     facet_row(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
                scales = "free", space = "free") + 
@@ -316,8 +317,8 @@ A neat trick is to add an additional layer using a modified data set where the
 faceting variable is removed:
 
 ```{r}
-ggplot(df, aes(x = hwy, y = cty)) +
-    geom_point(data = transform(df, fuel = NULL), colour = "grey80") +
+ggplot(vehicles, aes(x = hwy, y = cty)) +
+    geom_point(data = transform(vehicles, fuel = NULL), colour = "grey80") +
     geom_point() + 
     facet_wrap(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
                scales = "free") + 
@@ -328,7 +329,7 @@ Another option is to use the `gghighlight` package.
 The package can be used to highlight points in a single panel:
 
 ```{r}
-ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
+ggplot(vehicles %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
        aes(x = hwy, y = cty)) +
     geom_point(aes(color = fuel_lumped)) + 
     gghighlight(fuel_lumped == "Premium") + 
@@ -338,7 +339,7 @@ ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other"
 Or to highlight all points, and additionally facet:
 
 ```{r}
-ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
+ggplot(vehicles %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
        aes(x = hwy, y = cty)) +
     geom_point(aes(color = fuel_lumped)) + 
     gghighlight() + 
@@ -350,7 +351,7 @@ If the number of highlighted points is not too large, `gghighlight` will add
 a label for each point. 
 
 ```{r}
-ggplot(df %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
+ggplot(vehicles %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
        aes(x = hwy, y = cty)) +
     geom_point() + 
     gghighlight(hwy - cty > 15 | ((abs(hwy - 60) < 10) & (abs(cty - 75) < 10)), 
@@ -369,7 +370,7 @@ The default layout of a bar plot where each bar is further split by a
 variable is to stack the components on top of each other: 
 
 ```{r, fig.width = 10}
-ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar() + 
     ggp
@@ -381,7 +382,7 @@ However, if there are different numbers of subcategories, the bars will have
 different widths. 
 
 ```{r, fig.width = 10}
-ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = position_dodge()) + 
     ggp
@@ -394,7 +395,7 @@ which means that the same bar will not always appear in the same relative
 position.
 
 ```{r, fig.width = 10}
-ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = position_dodge2(preserve = "single")) + 
     ggp
@@ -408,7 +409,7 @@ the widths of the bars.
 
 ```{r, fig.width = 10}
 ## Side-by-side bar plot with consistent width and position
-ggplot(df %>% mutate(fuel = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+ggplot(vehicles %>% mutate(fuel = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                      make = fct_lump_n(make, n = 3)) %>%
            count(fuel, make) %>%
            complete(fuel = unique(fuel), make = unique(make), 
@@ -499,7 +500,7 @@ This can be achieved using the `scales` package:
 
 ```{r, fig.width = 9}
 ## scales::percent will multiply the values by 100 and add a % sign
-ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") + 
     scale_y_continuous(labels = scales::percent) + 
@@ -507,7 +508,7 @@ ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"),
     ggp
 
 ## scales::percent_format has more arguments
-ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") + 
     scale_y_continuous(labels = scales::percent_format(scale = 100, accuracy = 0.01)) + 
@@ -527,14 +528,14 @@ summary statistics, smoothing curves etc from the data.
 
 ```{r}
 ## xlim()/ylim() will replace out-of-range data by NA
-ggplot(df, aes(x = hwy, y = cty)) +
+ggplot(vehicles, aes(x = hwy, y = cty)) +
     geom_point(size = 8, shape = 1) +
     xlim(11, 59) + 
     geom_smooth() + 
     ggp
 
 ## coord_cartesian() just sets the displayed range
-ggplot(df, aes(x = hwy, y = cty)) +
+ggplot(vehicles, aes(x = hwy, y = cty)) +
     geom_point(size = 8, shape = 1) +
     coord_cartesian(xlim = c(11, 59)) + 
     geom_smooth() + 
@@ -555,7 +556,7 @@ used to turn a `ggplot` object into an interactive plot.
 ```{r}
 ## Turn a ggplot into an interactive plot with ggplotly
 ggplotly(
-    ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, 
+    ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, 
                                                    label = make)) +
         geom_point() + 
         ggp,
@@ -571,7 +572,7 @@ plots, without the intermediate `ggplot` object.
 # Titles, subtitles and captions
 
 ```{r}
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
     geom_point() + 
     labs(title = "This is the title", 
          subtitle = "And a subtitle",
@@ -586,7 +587,7 @@ and `caption`):
 
 ```{r}
 ggplotly(
-    ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
+    ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
         geom_point() + 
         labs(title = "This is the title", 
              subtitle = "And a subtitle",
@@ -609,7 +610,7 @@ them in an ellipse (`ggforce::geom_mark_circle`) or a polygon line
 
 ```{r}
 ## ggforce
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
     geom_point() + 
     geom_mark_ellipse(aes(label = "Interesting points", 
                           description = "These points are interesting",
@@ -642,12 +643,12 @@ plot. `geom_text_repel` just add's the text labels, `geom_label_repel` adds
 a filled background around each label:
 
 ```{r}
-ggplot(df %>% dplyr::filter(year == 2005 & hwy > 30), aes(x = hwy, y = cty)) +
+ggplot(vehicles %>% dplyr::filter(year == 2005 & hwy > 30), aes(x = hwy, y = cty)) +
     geom_point() + 
     geom_text_repel(aes(label = model)) +
     ggp
 
-ggplot(df %>% dplyr::filter(year == 2005 & hwy > 30), aes(x = hwy, y = cty)) +
+ggplot(vehicles %>% dplyr::filter(year == 2005 & hwy > 30), aes(x = hwy, y = cty)) +
     geom_point() + 
     geom_label_repel(aes(label = model)) +
     ggp + theme(panel.background = element_rect(fill = "gray88"))
@@ -667,9 +668,9 @@ ggplot(df %>% dplyr::filter(year == 2005 & hwy > 30), aes(x = hwy, y = cty)) +
 will be unaffected:
 
 ```{r}
-ggplot(df, aes(hwy, cty, color = fuel)) +
+ggplot(vehicles, aes(hwy, cty, color = fuel)) +
     geom_point(show.legend = FALSE) +
-    geom_point(inherit.aes = FALSE, data = df %>% dplyr::filter(make == "Ram"),
+    geom_point(inherit.aes = FALSE, data = vehicles %>% dplyr::filter(make == "Ram"),
                mapping = aes(hwy, cty, shape = model)) +
     ggp
 ```
@@ -677,7 +678,7 @@ ggplot(df, aes(hwy, cty, color = fuel)) +
 `theme(legend.position = "none")` completely suppresses the legend:
 
 ```{r}
-ggplot(df, aes(hwy, cty, color = fuel)) +
+ggplot(vehicles, aes(hwy, cty, color = fuel)) +
     geom_point() +
     ggp +
     theme(legend.position = "none")
@@ -693,7 +694,7 @@ and `"bottom"` to control the legend position (outside of the plot):
 ## legend position (outside of plot)
 ## allowed values for the arguments legend.position are:
 ## "left", "top", "right", "bottom"
-ggplot(df, aes(hwy, cty, color = fuel)) +
+ggplot(vehicles, aes(hwy, cty, color = fuel)) +
     geom_point() +
     ggp + 
     theme(legend.position = "bottom")
@@ -722,7 +723,7 @@ symbols:
 
 ```{r}
 ## number of rows (discrete scales)
-ggplot(df, aes(hwy, cty, color = fuel)) +
+ggplot(vehicles, aes(hwy, cty, color = fuel)) +
     geom_point() + 
     ggp +
     theme(legend.position = "bottom") +
@@ -742,20 +743,20 @@ ggplot(diamonds, aes(carat, price, color = cut)) +
 
 ```{r}
 ## One-sided gradient
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = cyl)) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = cyl)) +
     geom_point() + 
     scale_color_gradient(low = "white", high = "darkblue") + 
     ggp
 
 ## Two-sided gradient
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
     geom_point() + 
     scale_color_gradient2(low = "red", mid = "white", high = "darkblue", 
                           midpoint = 0) + 
     ggp
 
 ## Custom gradient
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
     geom_point() + 
     scale_color_gradientn(colours = hcl.colors(9, "Spectral")) + 
     ggp
@@ -764,13 +765,13 @@ ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(c
 ## viridis_c - continuous
 ## viridis_b - binned
 ## viridis_d - discrete
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
     geom_point() + 
     scale_color_viridis_c() + 
     ggp
 
 ## Manual colors
-ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") + 
     scale_fill_manual(values = c(BMW = "darkblue", Chevrolet = "red", 
@@ -781,27 +782,27 @@ ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"),
 ## Colors from existing palettes
 ## RColorBrewer palettes
 display.brewer.all()
-ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") +
     scale_fill_brewer(palette = "Set2", name = "Make") + 
     ggp
 
-ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") +
     scale_fill_brewer(palette = "Greens", name = "Make") + 
     ggp
 
 ## 'viridis' colors
-ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") +
     scale_fill_viridis_d() + 
     ggp
 
 ## multiple scales for color or fill: ggnewscale::new_scale
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = cyl)) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = cyl)) +
     geom_point(size = 3) + 
     scale_color_viridis_c() +
     new_scale("color") +
@@ -825,28 +826,28 @@ ggplot(diamonds, aes(x = carat, y = depth, color = price)) +
 
 ```{r}
 ## Histogram...
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy)) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy)) +
     geom_histogram(bins = 30) + 
     ggp
 
 ## ...is equivalent to
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(count))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(count))) +
     geom_histogram(bins = 30) + 
     ggp
 
 ## To get density instead:
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(density))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(density))) +
     geom_histogram(bins = 30) + 
     ggp
 
 ## In percentage
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(density))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(density))) +
     geom_histogram(bins = 30) + 
     scale_y_continuous(labels = scales::percent) + 
     ggp
 
 ## Other transformations - scale so that max height = 1
-ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(count/max(count)))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(count/max(count)))) +
     geom_histogram(bins = 30) + 
     ggp
 ```
@@ -856,17 +857,17 @@ ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(count/max
 # Combining plot panels
 
 ```{r}
-g1 <- ggplot(df, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+g1 <- ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                      fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") +
     scale_fill_brewer(palette = "Set2", name = "Make") + 
     ggp
-g2 <- ggplot(df %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+g2 <- ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
     geom_point() + 
     scale_color_gradient2(low = "red", mid = "white", high = "darkblue", 
                           midpoint = 0) + 
     ggp
-g3 <- ggplot(df %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
+g3 <- ggplot(vehicles %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
              aes(x = fct_reorder(class, mean_hwy), y = mean_hwy)) + 
     geom_point() + 
     coord_flip() + 
@@ -889,7 +890,7 @@ cowplot::plot_grid(g1 + theme(legend.position = "none"),
 `cowplot` doesn't work directly with the output of `ggpairs`, for example:
 
 ```{r, fig.width = 10, error = TRUE}
-gp <- ggpairs(df %>% dplyr::select(cty, hwy, cyl))
+gp <- ggpairs(vehicles %>% dplyr::select(cty, hwy, cyl))
 cowplot::plot_grid(gp, g1)
 ```
 
