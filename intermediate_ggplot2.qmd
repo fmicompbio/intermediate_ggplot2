@@ -796,31 +796,38 @@ ggplot(diamonds, aes(carat, price, color = cut)) +
 
 # Specifying color palettes
 
+There are many ways of specifying colors in ggplot2. 
+Here we show a few examples. 
+
 ```{r}
 ## One-sided gradient
-ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = cyl)) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy, y = cty, color = cyl)) +
     geom_point() + 
     scale_color_gradient(low = "white", high = "darkblue") + 
     ggp
 
-## Two-sided gradient
-ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+## Two-sided (divergent) gradient
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy, y = cty, color = scale(cyl))) +
     geom_point() + 
     scale_color_gradient2(low = "red", mid = "white", high = "darkblue", 
                           midpoint = 0) + 
     ggp
 
 ## Custom gradient
-ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy, y = cty, color = scale(cyl))) +
     geom_point() + 
     scale_color_gradientn(colours = hcl.colors(9, "Spectral")) + 
     ggp
 
-## viridis continuous colors
+## viridis palettes
 ## viridis_c - continuous
 ## viridis_b - binned
 ## viridis_d - discrete
-ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy, y = cty, color = scale(cyl))) +
     geom_point() + 
     scale_color_viridis_c() + 
     ggp
@@ -833,10 +840,15 @@ ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"),
                                  Ford = "forestgreen", Other = "grey85"),
                       name = "Make") + 
     ggp
+```
 
+```{r, fig.height = 9}
 ## Colors from existing palettes
 ## RColorBrewer palettes
 display.brewer.all()
+```
+
+```{r}
 ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") +
@@ -849,7 +861,7 @@ ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"),
     scale_fill_brewer(palette = "Greens", name = "Make") + 
     ggp
 
-## 'viridis' colors
+## viridis colors
 ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") +
@@ -857,7 +869,8 @@ ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"),
     ggp
 
 ## multiple scales for color or fill: ggnewscale::new_scale
-ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = cyl)) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy, y = cty, color = cyl)) +
     geom_point(size = 3) + 
     scale_color_viridis_c() +
     new_scale("color") +
@@ -865,8 +878,9 @@ ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = c
     scale_color_brewer(palette = "Dark2") + 
     ggp
 
-## cap color range
-## - one way of doing it: limit color range + set color for out-of-range NA values
+## Cap color range
+## - One way of doing it: limit color range + 
+##     set color for out-of-range NA values
 cols <- hcl.colors(8)
 ggplot(diamonds, aes(x = carat, y = depth, color = price)) +
     geom_point() +
@@ -875,49 +889,83 @@ ggplot(diamonds, aes(x = carat, y = depth, color = price)) +
                           na.value = cols[length(cols)]) + 
     ggp
 
+## Another way is to squish the out-of-bounds values to the nearest extreme
+## using e.g. the scales::squish function (the default value of oob is 
+## scales::censor, which sets the values to NA as in the previous example)
+ggplot(diamonds, aes(x = carat, y = depth, color = price)) +
+    geom_point() +
+    scale_color_gradientn(colors = cols,
+                          limits = c(5000, 10000),
+                          oob = scales::squish) + 
+    ggp
 ```
 
 # Using `after_stat` (previously `..*..`)
 
+(From [here](https://ggplot2.tidyverse.org/reference/aes_eval.html)): 
+`ggplot2` has three stages of the data that you can map aesthetics from. The 
+default is to map at the beginning, using the layer data provided by the user. 
+The second stage is after the data has been transformed by the layer stat. 
+The third and last stage is after the data has been transformed and mapped by 
+the plot scales. The most common example of mapping from stat transformed data 
+is the height of bars in `geom_histogram()`: the height does not come from a 
+variable in the underlying data, but is instead mapped to the count computed by
+`stat_bin()`. In order to map from stat transformed data you should use the
+`after_stat()` function to flag that evaluation of the aesthetic mapping 
+should be postponed until after stat transformation.
+
 ```{r}
-## Histogram...
-ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy)) +
+## This histogram code...
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy)) +
     geom_histogram(bins = 30) + 
     ggp
 
 ## ...is equivalent to
-ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(count))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy, y = after_stat(count))) +
     geom_histogram(bins = 30) + 
     ggp
 
-## To get density instead:
-ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(density))) +
+## To get the density instead:
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy, y = after_stat(density))) +
     geom_histogram(bins = 30) + 
     ggp
 
 ## In percentage
-ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(density))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy, y = after_stat(density))) +
     geom_histogram(bins = 30) + 
     scale_y_continuous(labels = scales::percent) + 
     ggp
 
 ## Other transformations - scale so that max height = 1
-ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = after_stat(count/max(count)))) +
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy, y = after_stat(count/max(count)))) +
     geom_histogram(bins = 30) + 
     ggp
 ```
 
-
-
 # Combining plot panels
 
+Several packages are available for combining multiple independent `ggplot`
+objects into panels of a single figure. Here we illustrate two of these. 
+
+## cowplot
+
+With the `cowplot` package, figures are combined using the `plot_grid()` 
+function. We first create a few plots that we will use for illustration.
+
 ```{r}
-g1 <- ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
-                     fill = fct_lump_n(make, n = 3))) +
+g1 <- ggplot(vehicles, 
+             aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
+                 fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") +
     scale_fill_brewer(palette = "Set2", name = "Make") + 
     ggp
-g2 <- ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, color = scale(cyl))) +
+g2 <- ggplot(vehicles %>% dplyr::filter(year == 2005), 
+             aes(x = hwy, y = cty, color = scale(cyl))) +
     geom_point() + 
     scale_color_gradient2(low = "red", mid = "white", high = "darkblue", 
                           midpoint = 0) + 
@@ -927,14 +975,41 @@ g3 <- ggplot(vehicles %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)),
     geom_point() + 
     coord_flip() + 
     ggp
-(g12 <- cowplot::plot_grid(g1, g2 + theme(legend.position = "none"),
-                           ncol = 1, labels = c("A", "B"), align = "v"))
-(g12 <- cowplot::plot_grid(g1, g2 + theme(legend.position = "none"),
-                           ncol = 1, labels = c("A", "B"), align = "v", axis = "lr"))
-cowplot::plot_grid(g12, g3, nrow = 1, labels = c("", "C"))
 ```
 
+Next we use `cowplot::plot_grid` to combine g1 and g2 (without legend) into 
+a single column.
+
 ```{r}
+(g12 <- cowplot::plot_grid(g1, g2 + theme(legend.position = "none"),
+                           ncol = 1, labels = c("A", "B"), align = "v"))
+```
+
+The `'align'` argument lets us specify how to align the individual panels.
+
+```{r}
+(g12 <- cowplot::plot_grid(g1, g2 + theme(legend.position = "none"),
+                           ncol = 1, labels = c("A", "B"), 
+                           align = "v", axis = "lr"))
+```
+
+We can also combine the outputs of `plot_grid` calls further. The relative 
+widths of the components can be specified using the `rel_widths` argument 
+(similarly for the relative heights and `rel_heights`).
+
+```{r, fig.width = 10}
+cowplot::plot_grid(g12, g3, nrow = 1, labels = c("", "C"), 
+                   rel_widths = c(1.5, 1))
+```
+
+Sometimes all our panels have a shared legend, which we don't want to repeat in 
+all the panels. At the same time, including it in one of the panels would 
+make it difficult to decide on the relative sizes (we may want the actual 
+plot area to be equally sized across the panels). One solution is to 
+extract the legend from one of the panels and include it as a separate element
+in the combined plot. 
+
+```{r, fig.width = 10}
 get_legend(g1)
 cowplot::plot_grid(g1 + theme(legend.position = "none"), 
                    g1 + theme(legend.position = "none"), 
@@ -942,30 +1017,56 @@ cowplot::plot_grid(g1 + theme(legend.position = "none"),
                    nrow = 1, rel_widths = c(1, 1, 0.4))
 ```
 
-`cowplot` doesn't work directly with the output of `ggpairs`, for example:
+We can also add a shared plot title as a separate panel element.
+
+```{r, fig.width = 10}
+my_title <- ggdraw() + draw_label("A shared title for the plot")
+cowplot::plot_grid(
+    my_title, 
+    cowplot::plot_grid(g1 + theme(legend.position = "none"), 
+                       g1 + theme(legend.position = "none"), 
+                       get_legend(g1), 
+                       nrow = 1, rel_widths = c(1, 1, 0.4)),
+    ncol = 1, rel_heights = c(0.1, 1)
+)
+```
+
+`cowplot` doesn't work directly with the output of `GGally::ggpairs`; 
+for example:
 
 ```{r, fig.width = 10, error = TRUE}
 gp <- ggpairs(vehicles %>% dplyr::select(cty, hwy, cyl))
-cowplot::plot_grid(gp, g1)
+cowplot::plot_grid(gp, g1, align = "h", axis = "tb")
 ```
 
 However, it works like this:
 
 ```{r, fig.width = 10}
-cowplot::plot_grid(ggmatrix_gtable(gp), g1)
+cowplot::plot_grid(ggmatrix_gtable(gp), g1, align = "h", axis = "tb")
 ```
 
-
-```{r}
 ## patchwork
+
+Another package that lets us combine `ggplot` objects is `patchwork`. The 
+syntax here is a bit different - `|` combines plots horizontally, and `/` 
+combines plots vertically. 
+
+```{r, fig.width = 9}
 g1 | g2
 g1 / g2 + theme(legend.position = "none")
 (g1 / g2) | g3
 ```
 
+We can add additional annotations (e.g., a shared title) as well: 
 
-- shared title
-
+```{r, fig.width = 10}
+pw <- (g1 / g2) | g3
+pw + plot_annotation(
+    title = "Here is the title",
+    subtitle = "And a subtitle",
+    caption = "And a caption"
+)
+```
 
 # Other material, sources for some of the material presented above
 
