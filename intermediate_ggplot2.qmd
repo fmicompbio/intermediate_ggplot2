@@ -636,12 +636,12 @@ ggplotly(
 
 # Adding statistical information to plots
 
-- `ggsignif`, `ggstatsplot`
+- TODO - e.g. using `ggsignif`, `ggstatsplot`
 
 # Adding text and annotation
 
 Sometimes it is useful to outline a subset of the observations, enclosing
-them in an ellipse (`ggforce::geom_mark_circle`) or a polygon line
+them in an ellipse (`ggforce::geom_mark_circle`) or a polygon 
 (`ggalt::geom_encircle`):
 
 ```{r}
@@ -675,7 +675,7 @@ ggplot(diamonds %>% group_by(carat, cut) %>% summarize(mean_price = mean(price))
 ```
 
 `ggrepel` is useful to add non-overlapping labels to observations in a scatter
-plot. `geom_text_repel` just add's the text labels, `geom_label_repel` adds
+plot. `geom_text_repel` just adds the text labels, while `geom_label_repel` adds
 a filled background around each label:
 
 ```{r}
