@@ -290,7 +290,7 @@ ggplot(vehicles, aes(x = fct_lump_n(make, n = 3))) +
     ggp
 ```
 
-Using `facet_wrap` with scales = "free" doesn't leave empty space, but the 
+Using `facet_wrap` with `scales = "free"` doesn't leave empty space, but the 
 bars are of different width. 
 
 ```{r, fig.width = 10}
@@ -345,7 +345,8 @@ Another option is to use the `gghighlight` package.
 The package can be used to highlight points in a single panel:
 
 ```{r}
-ggplot(vehicles %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
+ggplot(vehicles %>% mutate(
+    fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
        aes(x = hwy, y = cty)) +
     geom_point(aes(color = fuel_lumped)) + 
     gghighlight(fuel_lumped == "Premium") + 
@@ -355,7 +356,8 @@ ggplot(vehicles %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "
 Or to highlight all points, and additionally facet:
 
 ```{r}
-ggplot(vehicles %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
+ggplot(vehicles %>% mutate(
+    fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
        aes(x = hwy, y = cty)) +
     geom_point(aes(color = fuel_lumped)) + 
     gghighlight() + 
@@ -367,7 +369,8 @@ If the number of highlighted points is not too large, `gghighlight` will add
 a label for each point. 
 
 ```{r}
-ggplot(vehicles %>% mutate(fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
+ggplot(vehicles %>% mutate(
+    fuel_lumped = fct_lump_n(fuel, n = 3, other_level = "Other")),
        aes(x = hwy, y = cty)) +
     geom_point() + 
     gghighlight(hwy - cty > 15 | ((abs(hwy - 60) < 10) & (abs(cty - 75) < 10)), 
@@ -527,7 +530,8 @@ ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"),
 ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") + 
-    scale_y_continuous(labels = scales::percent_format(scale = 100, accuracy = 0.01)) + 
+    scale_y_continuous(labels = scales::percent_format(scale = 100, 
+                                                       accuracy = 0.01)) + 
     labs(y = "Percentage") + 
     ggp
 ```
