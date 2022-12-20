@@ -79,7 +79,7 @@ jobs:
       - name: Install deploy dependencies
         if: github.ref == 'refs/heads/main'
         run: |
-          apt-get update && apt-get -y install rsync
+          sudo apt-get update && apt-get -y install rsync
 
       - name: Deploy 🚀
         if: github.ref == 'refs/heads/main'
