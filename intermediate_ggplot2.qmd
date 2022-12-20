@@ -687,12 +687,30 @@ ggplot(vehicles %>% dplyr::filter(year == 2005 & hwy > 30), aes(x = hwy, y = cty
 ggplot(vehicles %>% dplyr::filter(year == 2005 & hwy > 30), aes(x = hwy, y = cty)) +
     geom_point() + 
     geom_label_repel(aes(label = model)) +
-    ggp + theme(panel.background = element_rect(fill = "gray88"))
+    ggp + 
+    theme(panel.background = element_rect(fill = "gray88"))
 ```
 
-- `geomtextpath`
-- `ggtext`
-- add number of values in bar plot (https://r-graphics.org/recipe-bar-graph-labels)
+Note that `ggrepel` will not show labels overlapping too many other things. 
+This can be controlled with the `max.overlaps` argument (by default, this is 
+set to 10).
+We can also instruct `ggrepel` to always draw a line to the corresponding 
+point from a given label (even if they are very close) by setting  
+`min.segment.length = 0`. 
+
+```{r}
+ggplot(vehicles %>% dplyr::filter(year == 2005 & hwy > 30), 
+       aes(x = hwy, y = cty)) +
+    geom_point() + 
+    geom_label_repel(aes(label = model), max.overlaps = 25, 
+                     min.segment.length = 0) +
+    ggp + 
+    theme(panel.background = element_rect(fill = "gray88"))
+```
+
+Other packages that are useful for annotation of graphs are `geomtextpath`, 
+which allows adding curved text to `ggplot` objects, and `ggtext`, which 
+provides improved support for text rendering (e.g. using `markdown`). 
 
 # Customizing legends
 
@@ -700,13 +718,14 @@ ggplot(vehicles %>% dplyr::filter(year == 2005 & hwy > 30), aes(x = hwy, y = cty
 
 ## Suppressing the legend
 
-`show.legend` can be used to not include a single layer in the legend. Other layers
+`show.legend` can be used to exclude a single layer from the legend. Other layers
 will be unaffected:
 
 ```{r}
 ggplot(vehicles, aes(hwy, cty, color = fuel)) +
     geom_point(show.legend = FALSE) +
-    geom_point(inherit.aes = FALSE, data = vehicles %>% dplyr::filter(make == "Ram"),
+    geom_point(inherit.aes = FALSE, 
+               data = vehicles %>% dplyr::filter(make == "Ram"),
                mapping = aes(hwy, cty, shape = model)) +
     ggp
 ```
