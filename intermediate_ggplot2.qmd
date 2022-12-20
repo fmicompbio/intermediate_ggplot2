@@ -185,22 +185,30 @@ the value of another variable.
 <!-- For example, to plot library sizes of samples, ordered by experiment.-->
 
 ```{r}
-ggplot(vehicles %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
-       aes(x = fct_reorder(class, mean_hwy), y = mean_hwy)) + 
+ggplot(vehicles %>% group_by(class) %>% summarize(median_hwy = median(hwy)), 
+       aes(x = fct_reorder(class, median_hwy), y = median_hwy)) + 
     geom_col() + 
     coord_flip() + 
     ggp
 
-ggplot(vehicles %>% group_by(class) %>% summarize(mean_hwy = mean(hwy)), 
-       aes(x = fct_reorder(class, mean_hwy), y = mean_hwy)) + 
+ggplot(vehicles %>% group_by(class) %>% summarize(median_hwy = median(hwy)), 
+       aes(x = fct_reorder(class, median_hwy), y = median_hwy)) + 
     geom_point() + 
+    coord_flip() + 
+    ggp
+
+## Without prior aggregation - show all points, but order levels by median hwy
+ggplot(vehicles, 
+       aes(x = fct_reorder(class, hwy, .fun = median), y = hwy)) + 
+    geom_point() + 
+    geom_boxplot(alpha = 0, color = "red") + 
     coord_flip() + 
     ggp
 ```
 
 # Faceting
 
-Faceting splits a plot into several panels according to the value of a given 
+Faceting splits a plot into multiple panels according to the value of a given 
 variable.
 There are several faceting function in `ggplot2`, and additional ones 
 provided in extension packages to address missing functionality. 
