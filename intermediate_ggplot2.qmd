@@ -448,7 +448,7 @@ and slow to display, especially when saved a vector-based graphics device like
 
 A possible solution to this problem is to render the plot into a bitmap image
 by saving it to a bitmap-based graphics device like `png` or `jpeg`. However,
-a disadvantage of this approach is all elements will be rendered into that
+a disadvantage of this approach is that all elements will be rendered into that
 image and no adjustments to individual elements can be done afterwards, like for
 example increasing the text size of the axis titles.
 
@@ -568,28 +568,44 @@ Interactive plots can be very helpful for exploratory purposes, and can
 be directly embedded in R Markdown or Quarto reports. 
 However, it is worth noting that they do inflate the size of the report 
 (sometimes dramatically, if the number of points is very large).
-Here we will illustrate two approaches to making interactive "`ggplot`-like" 
-graphics. 
+Here we will illustrate a few different approaches to making interactive
+"`ggplot`-like" graphics. 
+
+## (gg)plotly
+
 First, we use the `ggplotly` function from the `plotly` package, which can be 
 used to turn a `ggplot` object into an interactive plot. 
 
 ```{r}
 ## Turn a ggplot into an interactive plot with ggplotly
 ggplotly(
-    ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty, 
-                                                   label = make)) +
+    ggplot(vehicles %>% dplyr::filter(year == 2005), 
+           aes(x = hwy, y = cty, label = make)) +
         geom_point() + 
         ggp,
-    tooltip = c("label", "x", "y", "text")
+    tooltip = c("label", "x", "y")
 )
 ```
 
 Note that `plotly` can also be used to directly generate advanced interactive 
 plots, without the intermediate `ggplot` object. 
 
-- `ggiraph`
+## ggiraph
+
+Another option for making interactive graphs is to use the `ggiraph` package, 
+which provides dedicated interactive layers. 
+
+```{r}
+girafe(ggobj = ggplot(vehicles) +
+           geom_point_interactive(aes(x = hwy, y = cty,
+                                      tooltip = make, data_id = make)) + 
+           ggp)
+```
+
 
 # Titles, subtitles and captions
+
+`ggplot2` provides many ways of labeling your plot. 
 
 ```{r}
 ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
