@@ -39,6 +39,10 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
       
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update && sudo apt-get -y install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev
+
       - name: Install dependencies
         run: |
           install.packages("BiocManager")
