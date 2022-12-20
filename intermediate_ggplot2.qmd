@@ -9,6 +9,18 @@ editor_options:
   chunk_output_type: console
 ---
 
+In this document, we have made an attempt to collect useful "tips and tricks" 
+related to the use of `ggplot2` and associated packages. It does not aim to 
+provide a general introduction to `ggplot2` - for that, see e.g. the following
+resources: 
+
+* The [`ggplot2` website](https://ggplot2.tidyverse.org/) and
+[cheat sheet](https://github.com/rstudio/cheatsheets/blob/main/data-visualization-2.1.pdf)
+* The [`ggplot2` book](https://ggplot2-book.org/)
+* A [list of `ggplot2` extensions](http://exts.ggplot2.tidyverse.org/)
+
+The different sections below are mostly independent from each other, and cover
+different aspects of adjusting `ggplot` objects.
 
 # Load packages
 
