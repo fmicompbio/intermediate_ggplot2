@@ -61,7 +61,7 @@ suppressPackageStartupMessages({
 
 # A quick look at the data
 
-We will use two different data sets to illustrate the tips and tricks in this 
+We will use three different data sets to illustrate the tips and tricks in this 
 document. 
 The first one comes from the `fueleconomy` package, and provides fuel economy 
 data from the EPA between the years 1985 and 2015. 
@@ -79,10 +79,18 @@ on a set of diamonds.
 diamonds
 ```
 
+The third data set is the `iris` data set, which contains measurements of 
+petal and sepal length and width for 150 iris flowers of different species.
+
+```{r}
+head(iris)
+```
+
+
 # Defining a general theme
 
-Before we start making plots, we define a theme that we will apply to all 
-plots that we generate.
+Before we start making plots, we define a theme that we will apply to the 
+plots that we generate, when applicable.
 There are many ways of doing this - arguably the most straightforward is to 
 assign the theme-related parts of a `ggplot` call to a variable, and add 
 this variable to all subsequent plots. 
