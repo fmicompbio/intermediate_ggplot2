@@ -712,6 +712,8 @@ Other packages that are useful for annotation of graphs are `geomtextpath`,
 which allows adding curved text to `ggplot` objects, and `ggtext`, which 
 provides improved support for text rendering (e.g. using `markdown`). 
 
+Here are some more tips for using annotations in ggplots: [https://www.cararthompson.com/talks/user2022/](https://www.cararthompson.com/talks/user2022/).
+
 # Customizing legends
 
 `ggplot2` itself allows to control the placement of the legend in various ways.
