@@ -796,10 +796,12 @@ ggplot(diamonds, aes(carat, price, color = cut)) +
     guides(color = guide_legend(override.aes = list(size = 4, alpha = 1)))
 ```
 
-# Specifying color palettes
+# Specifying colors
 
 There are many ways of specifying colors in ggplot2. 
 Here we show a few examples. 
+
+## Specifying color gradients using defined colors
 
 ```{r}
 ## One-sided gradient
@@ -824,16 +826,6 @@ ggplot(vehicles %>% dplyr::filter(year == 2005),
     scale_color_gradientn(colours = hcl.colors(9, "Spectral")) + 
     ggp
 
-## viridis palettes
-## viridis_c - continuous
-## viridis_b - binned
-## viridis_d - discrete
-ggplot(vehicles %>% dplyr::filter(year == 2005), 
-       aes(x = hwy, y = cty, color = scale(cyl))) +
-    geom_point() + 
-    scale_color_viridis_c() + 
-    ggp
-
 ## Manual colors
 ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
@@ -844,11 +836,61 @@ ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"),
     ggp
 ```
 
+## Named color palettes
+
+`RColorBrewer` comes with many discrete, sequential or divergent color palettes:
+
 ```{r, fig.height = 9}
 ## Colors from existing palettes
 ## RColorBrewer palettes
 display.brewer.all()
 ```
+
+`R` also has many built-in palettes, available using the `hcl.colors()` function.
+These also include widely used contributed palettes such as viridis or many of
+ColorBrewer palettes (see available names using `hcl.pals()`):
+```{r}
+hcl.colors(3, "Dark2")
+hcl.pals()
+```
+
+The following code displays all palettes in `hcl.colors()` using code
+from `example(hcl.colors)`
+```{r, fig.height=6}
+hcl.swatch <- function(type = NULL, n = 7, nrow = 12,
+  border = if (n < 15) "black" else NA) {
+    palette <- hcl.pals(type)
+    cols <- sapply(palette, hcl.colors, n = n)
+    ncol <- ncol(cols)
+    nswatch <- min(ncol, nrow)
+
+    par(mar = rep(0.1, 4),
+        mfrow = c(1, min(5, ceiling(ncol/nrow))),
+        pin = c(1, 0.5 * nswatch),
+        cex = 0.7)
+
+    while (length(palette)) {
+        subset <- 1:min(nrow, ncol(cols))
+        plot.new()
+        plot.window(c(0, n), c(0, nrow + 1))
+        text(0, rev(subset) + 0.1, palette[subset], adj = c(0, 0))
+        y <- rep(subset, each = n)
+        rect(rep(0:(n-1), n), rev(y), rep(1:n, n), rev(y) - 0.5,
+             col = cols[, subset], border = border)
+        palette <- palette[-subset]
+        cols <- cols[, -subset, drop = FALSE]
+    }
+
+    par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1), cex = 1)
+}
+hcl.swatch()
+# hcl.swatch("qualitative")
+# hcl.swatch("sequential")
+# hcl.swatch("diverging")
+# hcl.swatch("divergingx")
+```
+
+We can use those named palettes in ggplot2 as follows:
 
 ```{r}
 ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
@@ -863,13 +905,25 @@ ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"),
     scale_fill_brewer(palette = "Greens", name = "Make") + 
     ggp
 
-## viridis colors
+## viridis palettes
+## viridis_c - continuous
+## viridis_b - binned
+## viridis_d - discrete
+ggplot(vehicles %>% dplyr::filter(year == 2005), 
+       aes(x = hwy, y = cty, color = scale(cyl))) +
+    geom_point() + 
+    scale_color_viridis_c() + 
+    ggp
+
 ggplot(vehicles, aes(x = fct_lump_n(fuel, n = 3, other_level = "Other"), 
                fill = fct_lump_n(make, n = 3))) +
     geom_bar(position = "fill") +
     scale_fill_viridis_d() + 
     ggp
+```
 
+## Using multiple color scales for different layers
+```{r}
 ## multiple scales for color or fill: ggnewscale::new_scale
 ggplot(vehicles %>% dplyr::filter(year == 2005), 
        aes(x = hwy, y = cty, color = cyl)) +
@@ -879,8 +933,10 @@ ggplot(vehicles %>% dplyr::filter(year == 2005),
     geom_point(aes(color = fuel), shape = 21, size = 4, stroke = 1) +
     scale_color_brewer(palette = "Dark2") + 
     ggp
+```
 
 ## Cap color range
+```{r}
 ## - One way of doing it: limit color range + 
 ##     set color for out-of-range NA values
 cols <- hcl.colors(8)
@@ -899,6 +955,22 @@ ggplot(diamonds, aes(x = carat, y = depth, color = price)) +
     scale_color_gradientn(colors = cols,
                           limits = c(5000, 10000),
                           oob = scales::squish) + 
+    ggp
+```
+
+## Creating darker/lighter variants of a color
+The functions in the `colorspace` package allow you to work with colors,
+for example create a darker or lighter variant of a color, using `darken()`
+or `lighten`:
+
+```{r}
+# make the box plot outlines a bit darker than the fill
+cols <- hcl.colors(nlevels(diamonds$clarity), "Dark2")
+names(cols) <- levels(diamonds$clarity)
+ggplot(diamonds, aes(x = clarity, y = price, color = clarity, fill = clarity)) +
+    geom_boxplot(outlier.shape = NA, linewidth = 1.2) +
+    scale_color_manual(values = colorspace::darken(cols, amount = 0.2)) +
+    scale_fill_manual(values = colorspace::lighten(cols, amount = 0.1)) +
     ggp
 ```
 
