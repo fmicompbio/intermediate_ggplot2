@@ -44,6 +44,7 @@ suppressPackageStartupMessages({
     library(ggtext)
     library(ggnewscale)
     library(ggrastr)
+    library(scattermore)
     ## packages to combine multiple figures
     library(patchwork)
     library(cowplot)
@@ -53,6 +54,7 @@ suppressPackageStartupMessages({
     ## color packages
     library(RColorBrewer)
     library(circlize)
+    library(colorspace)
     ## other packages
     library(sessioninfo)
     library(fueleconomy)
@@ -473,6 +475,8 @@ get_filesize_kb(p0, "pdf")
 get_filesize_kb(p0, "png")
 ```
 
+## Using `ggrastr`
+
 A more elegant solution is provided by the `ggrastr` package, that allows to
 raster just the problematic layer, while keeping the remaining layers as vectors,
 for example using the `geom_point_rast` function:
@@ -505,6 +509,28 @@ p3
 get_filesize_kb(p3, "pdf")
 ```
 
+## Using `scattermore`
+
+The `scattermore` uses a conceptually similar approach, but is optimized for
+very large numbers of points (think many millions). It provides two functions:
+
+- `geom_scattermore()` behaves fully as any other ggplot2 geometrical layer
+- `geom_scattermost()` that plots even faster at the expense of bypassing most
+  of the ggplot functionality (e.g. you need to provide a two-colom data frame
+  directly to the function)
+
+```{r}
+ggplot(diamonds, aes(carat, price, color = clarity)) +
+    geom_scattermore(pointsize = 0.8) +
+    ggp
+
+# geom_scattermost ignores data and aesthetic mappings
+# -> need to provide data frame and if desired color vector
+ggplot(diamonds) +
+    geom_scattermost(xy = as.data.frame(diamonds[, c('carat', 'price')]),
+                     pointsize = 0.4) +
+    ggp
+```
 
 # Changing scales for axes
 
