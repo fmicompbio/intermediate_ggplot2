@@ -55,7 +55,8 @@ jobs:
                                  "ggstatsplot", "gghighlight", "ggrepel", 
                                  "ggtext", "ggnewscale", "ggrastr", "patchwork", 
                                  "cowplot", "plotly", "ggiraph", "RColorBrewer", 
-                                 "circlize", "sessioninfo", "fueleconomy"), 
+                                 "circlize", "sessioninfo", "fueleconomy",
+                                 "scattermore", "colorspace"), 
                                Ncpu = 2L)
         shell: Rscript {0}
 
