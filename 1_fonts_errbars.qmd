@@ -1,0 +1,154 @@
+---
+title: "Using custom fonts and plotting with error bars"
+author: "Michael Stadler"
+format:
+    html:
+        toc: true
+        toc-location: left
+        embed-resources: true
+        link-external-icon: true
+        code-fold: true
+editor_options: 
+    chunk_output_type: console
+---
+
+## Summary
+
+This document illustrates how to use `ggplot2` to:
+
+- make a plot that uses custom fonts
+- make a plot with error bars
+
+
+## Prepare data
+
+Run the following code to prepare the data used in this document:
+
+```{r}
+#| label: prepare_data
+
+suppressPackageStartupMessages({
+    library(dplyr)
+    library(tibble)
+})
+
+# built-in `mtcars` dataset (see ?mtcars)
+# ... convert some columns to factors
+mycars <- mtcars
+mycars$cyl <- factor(mycars$cyl, levels = c("4","6","8"))
+mycars$engine_shape <- factor(c("0" = "V-shaped", "1" = "straight")[as.character(mycars$vs)])
+mycars$transmission <- factor(c("0" = "automatic", "1" = "manual")[as.character(mycars$am)])
+
+# ... summarize power by cylinders
+mycars_summary <- mycars |>
+    group_by(cyl) |>
+    summarise(hp_avg = mean(hp),
+              hp_sem = sd(hp) / sqrt(length(hp)),
+              .groups = "drop")
+
+tibble(mycars)
+tibble(mycars_summary)
+```
+
+
+## Create figure
+
+### Load packages
+```{r}
+#| label: load_packages
+
+library(ggplot2)
+library(ragg)
+library(systemfonts)
+
+# remark: have to set the chunk output device to "ragg_png"
+knitr::opts_chunk$set(dev = "ragg_png")
+```
+
+
+### Get fonts
+```{r}
+#| label: get_fonts
+
+# list available fonts:
+fonts <- systemfonts::system_fonts()
+fonts
+unique(fonts$family)
+
+# download and register an additional font
+# ... already registered fonts
+systemfonts::registry_fonts()
+# ... download Gochi Hand
+download.file(url = "https://github.com/huertatipografica/gochi-hand/archive/master.zip",
+              destfile = file.path(tempdir(), "master.zip"))
+ttf <- grep(".ttf$", unzip(file.path(tempdir(), "master.zip"), exdir = tempdir()), value = TRUE)
+systemfonts::register_font(name = "Gochi Hand", plain = ttf)
+# ... list the now registered fonts
+systemfonts::registry_fonts()
+```
+
+### Plot
+```{r}
+#| label: plot
+
+# create base plot
+p0 <- ggplot(data = mycars, mapping = aes(x = cyl)) +
+    coord_cartesian(ylim = c(0, 250)) +
+    labs(x = "Number of cylinders", y = "Gross horsepower") +
+    theme_bw(20) +
+    theme(panel.grid = element_blank())
+
+# ... add bars and Roman font
+p0 +
+    geom_col(data = mycars_summary, mapping = aes(y = hp_avg),
+             fill = "gray70") +
+    geom_errorbar(data = mycars_summary,
+                  mapping = aes(ymin = hp_avg - hp_sem,
+                                ymax = hp_avg + hp_sem),
+                  width = 0.6) +
+    annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.1,
+             label = "Question:\nIs this font well readable?",
+             family = "Z003", size = 18 / .pt) +
+    theme(text = element_text(family = "Z003"))
+
+# ... add points with errorbars and handwriting-style font
+p0 +
+    geom_pointrange(data = mycars_summary,
+                    mapping = aes(y = hp_avg,
+                                ymin = hp_avg - hp_sem,
+                                ymax = hp_avg + hp_sem),
+                    fatten = 6,
+                    color = "firebrick") +
+    geom_point(mapping = aes(y = hp), shape = 1) +
+    annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.1,
+             label = "Conclusion:\nMore cylinders give\n increased power",
+             family = "Gochi Hand", size = 18 / .pt) +
+    annotate("text", x = Inf, y = -Inf, hjust = 1.1, vjust = -0.5,
+             label = "mean +/- sem", color = "firebrick",
+             family = "Gochi Hand", size = 18 / .pt) +
+    theme(text = element_text(family = "Gochi Hand"))
+```
+
+
+## Remarks
+
+The page at https://r-graph-gallery.com/custom-fonts-in-R-and-ggplot2.html
+describes two ways to use custom fonts with `ggplot2`:
+
+- [`ragg`](https://ragg.r-lib.org/) is a graphics backend (it renders the plot
+  to a bitmap graphics device like `png()`), and can make all system fonts
+  available to be used in R. This is the approach used above. `ragg` is based
+  on the fast [`AGG`](https://github.com/ghaerr/agg-2.6) library, does not
+  require you to use any other packages and is also fully integrated into
+  RStudio (you can select is as your default graphics device in "Tools" ->
+  "Global options..." -> "General", panel "Graphics").
+- [`showtext`](https://github.com/yixuan/showtext) is a package that is
+  especially designed to use custom fonts with `pdf()` devices. After loading
+  a font and activating `showtext`, it renders the characters as filled polygons.
+
+## Session info
+
+```{r}
+#| label: session_info
+sessioninfo::session_info()
+```
