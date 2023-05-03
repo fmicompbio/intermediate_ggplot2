@@ -145,6 +145,9 @@ describes two ways to use custom fonts with `ggplot2`:
 - [`showtext`](https://github.com/yixuan/showtext) is a package that is
   especially designed to use custom fonts with `pdf()` devices. After loading
   a font and activating `showtext`, it renders the characters as filled polygons.
+  
+Another useful page with more detailed information about using fonts in
+`ggplot2` and `R` in general: https://yjunechoe.github.io/posts/2021-06-24-setting-up-and-debugging-custom-fonts/
 
 ## Session info
 
