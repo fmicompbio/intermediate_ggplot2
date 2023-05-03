@@ -1,0 +1,27 @@
+---
+title: "Intermediate ggplot2 workshop 2023"
+output:
+  rmarkdown::html_document:
+    theme: united
+    highlight: pygments
+    toc: false
+    fig_width: 5
+editor_options: 
+  chunk_output_type: console
+---
+
+This page contains links to material for the FMI intermediate workshop on [ggplot2](https://ggplot2.tidyverse.org/).
+
+To follow the workshop, the following packages need to be installed (everything 
+that is needed is installed on the FMI RStudio servers - connect to either 
+[https://xenon8.fmi.ch/](https://xenon8.fmi.ch/) or [https://rstudio.fmi.ch/](https://rstudio.fmi.ch/)):
+
+```{r, eval = FALSE}
+pkgs <- c("knitr", "rmarkdown", "dplyr", "ggplot2", "xaringan", "tidyr", "MASS",
+          "cowplot", "tidyverse", "stringi", "glue", "purrr", "magick")
+install.packages("BiocManager")
+BiocManager::install(pkgs)
+```
+
+
+* [Tips and tricks](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/intermediate_ggplot2.html)
