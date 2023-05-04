@@ -1,6 +1,6 @@
 ---
 title: "Scatter plots with *many* points"
-author: "Michael Stadler"
+author: "Michael Stadler, Charlotte Soneson"
 format:
     html:
         toc: true
@@ -57,7 +57,7 @@ The `diamonds` dataset has `r nrow(diamonds)` observations. If stored
 into a vectorized graphics device such as `pdf()` or `svg()`, the file will be
 large (each observation is individually represented as graphic elements)
 and slow to open or arrange. Furthermore, the high number of data points
-leads to saturation and we do not seed the underlying density of data points.
+leads to saturation and we do not see the underlying density of data points.
 ```{r}
 #| label: plot
 #| fig-width: 7

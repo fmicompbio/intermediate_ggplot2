@@ -1,6 +1,6 @@
 ---
 title: "Scatter plots with marginal densities and repelling labels"
-author: "Michael Stadler"
+author: "Michael Stadler, Charlotte Soneson"
 format:
     html:
         toc: true

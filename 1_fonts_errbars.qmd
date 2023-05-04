@@ -1,6 +1,6 @@
 ---
 title: "Using custom fonts and plotting with error bars"
-author: "Michael Stadler"
+author: "Michael Stadler, Charlotte Soneson"
 format:
     html:
         toc: true
