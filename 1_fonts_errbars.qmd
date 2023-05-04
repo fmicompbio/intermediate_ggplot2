@@ -82,7 +82,9 @@ systemfonts::registry_fonts()
 # ... download Gochi Hand
 download.file(url = "https://github.com/huertatipografica/gochi-hand/archive/master.zip",
               destfile = file.path(tempdir(), "master.zip"))
-ttf <- grep(".ttf$", unzip(file.path(tempdir(), "master.zip"), exdir = tempdir()), value = TRUE)
+extracted_files <- unzip(file.path(tempdir(), "master.zip"), exdir = tempdir())
+ttf <- grep(".ttf$", extracted_files, value = TRUE)
+ttf
 systemfonts::register_font(name = "Gochi Hand", plain = ttf)
 # ... list the now registered fonts
 systemfonts::registry_fonts()
