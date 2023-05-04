@@ -26,6 +26,7 @@ Run the following code to prepare the data used in this document:
 
 ```{r}
 #| label: prepare_data
+#| code-fold: false
 
 suppressPackageStartupMessages({
     library(tibble)
