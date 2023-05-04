@@ -86,6 +86,7 @@ jobs:
           cp -r index.html _site/
           cp -r intermediate_ggplot2_files intermediate_ggplot2.html _site/
           cp -r 1_fonts_errbars.html _site/
+          cp -r 2_ggmargin_ggrepel.html _site/
 
       - name: Install deploy dependencies
         if: github.ref == 'refs/heads/main'

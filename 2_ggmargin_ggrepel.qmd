@@ -1,0 +1,134 @@
+---
+title: "Scatter plots with marginal densities and repelling labels"
+author: "Michael Stadler"
+format:
+    html:
+        toc: true
+        toc-location: left
+        embed-resources: true
+        link-external-icon: true
+        code-fold: true
+editor_options: 
+    chunk_output_type: console
+---
+
+## Summary
+
+This document illustrates how to use `ggplot2` to:
+
+- make a scatter plot that shows densities of points in the margins
+- add labels to a scatter plot that do not overlap each other (repelling labels)
+
+
+## Prepare data
+
+Run the following code to prepare the data used in this document:
+
+```{r}
+#| label: prepare_data
+
+suppressPackageStartupMessages({
+    library(dplyr)
+    library(tibble)
+})
+
+# built-in `mtcars` dataset (see ?mtcars)
+# ... convert some columns to factors
+mycars <- mtcars
+mycars$model <- rownames(mycars)
+mycars$cyl <- factor(mycars$cyl, levels = c("4","6","8"))
+mycars$engine_shape <- factor(c("0" = "V-shaped", "1" = "straight")[as.character(mycars$vs)])
+mycars$transmission <- factor(c("0" = "automatic", "1" = "manual")[as.character(mycars$am)])
+
+tibble(mycars)
+```
+
+
+## Create figure
+
+### Load packages
+```{r}
+#| label: load_packages
+
+library(ggplot2)
+library(ggExtra)
+library(ggrepel)
+```
+
+
+### Plot
+```{r}
+#| label: plot
+#| fig-width: 7
+#| fig-height: 7
+
+# create base plot
+p0 <- ggplot(data = mycars, mapping = aes(x = mpg, y = hp)) +
+    geom_point() +
+    labs(x = "Fuel efficiency (miles/gallon)", y = "Gross horsepower") +
+    theme_bw(20) +
+    theme(panel.grid = element_blank(),
+          legend.position = "bottom")
+p0
+```
+
+```{r}
+#| label: plot_margin_hist
+#| fig-width: 7
+#| fig-height: 7
+
+# ... with marginal histograms
+ggMarginal(p0, type = "histogram", margins = "both", size = 4, bins = 7)
+```
+
+```{r}
+#| label: plot_margin_dens
+#| fig-width: 7
+#| fig-height: 7
+
+# ... with marginal density plots by number of cylinders
+ggMarginal(p0 +
+               aes(fill = cyl, col = cyl) +
+               labs(fill = "#cylinders:",
+                    color = "#cylinders:"),
+           type = "density", margins = "both", size = 4,
+           groupFill = TRUE)
+```
+
+```{r}
+#| label: plot_margin_violin_repel
+#| fig-width: 7
+#| fig-height: 7
+
+# ... with marginal violin and labelled data points
+ggMarginal(p0 +
+               geom_text_repel(mapping = aes(label = model),
+                               color = "black") +
+               aes(fill = cyl, col = cyl) +
+               labs(fill = "#cylinders:",
+                    color = "#cylinders:"),
+           type = "violin", margins = "both", size = 4,
+           groupFill = TRUE)
+```
+
+
+## Remarks
+
+- [`ggMarginal`](https://cran.r-project.org/web/packages/ggExtra/vignettes/ggExtra.html)
+  requires either a `ggplot2` plot object with a `geom_point()` layer (argument
+  `p`, as used above), or you can provide argument `data`, `x` and `y` instead.
+- [`ggMarginal`](https://cran.r-project.org/web/packages/ggExtra/vignettes/ggExtra.html)
+  supports different types of marginals (`type` argument): density, histogram,
+  boxplot, violin, densigram.
+- [`ggrepel`](https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html)
+  provides to major functions to add labels to a `ggplot2` figure: `geom_text_repel()`
+  (the one we used above) just adds the labels, and `geom_label_repel()` which in
+  addition draws a rectangle underneath the text, which may make the labels easier
+  to read on crowded plots.
+  
+## Session info
+
+```{r}
+#| label: session_info
+sessioninfo::session_info()
+```

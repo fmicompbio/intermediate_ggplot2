@@ -26,3 +26,4 @@ BiocManager::install(pkgs)
 
 * [Tips and tricks](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/intermediate_ggplot2.html)
 * [1 - Using custom fonts; plots with error bars](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/1_fonts_errbars.html)
+* [2 - Scatterplots with marginal densities and repelling labels](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/2_ggmargin_ggrepel.html)
