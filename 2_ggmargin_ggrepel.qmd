@@ -28,7 +28,6 @@ Run the following code to prepare the data used in this document:
 #| label: prepare_data
 
 suppressPackageStartupMessages({
-    library(dplyr)
     library(tibble)
 })
 
