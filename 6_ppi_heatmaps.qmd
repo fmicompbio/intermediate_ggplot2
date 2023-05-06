@@ -1,0 +1,211 @@
+---
+title: "Creating customized heatmaps and combining them in a single figure"
+author: "Charlotte Soneson, Michael Stadler"
+format:
+    html:
+        toc: true
+        toc-location: left
+        embed-resources: true
+        link-external-icon: true
+        code-fold: true
+editor_options: 
+    chunk_output_type: console
+---
+
+## Summary
+
+This document illustrates how to use `ggplot2` to:
+
+- create customized heatmaps with nested axis label layers
+- combine many multiple such heatmaps in a grid
+
+
+## Prepare data
+
+Run the following code to prepare the data used in this document:
+
+```{r}
+#| label: prepare_data
+#| code-fold: false
+
+suppressPackageStartupMessages({
+    library(tibble)
+    library(dplyr)
+})
+
+aa <- rev(c("A", "L", "I", "V", "F", "W", "Y", "H", 
+            "S", "T", "Q", "N", "D", "E", "K", "R", 
+            "M", "C", "G", "P", "*"))
+pos_levels <- expand.grid(letters[seq_len(7)], seq_len(5)) %>%
+    tidyr::unite(col = "final_position", c("Var2", "Var1"), sep = "") %>%
+    dplyr::pull(final_position) %>% unique()
+set.seed(123)
+ppis <- data.frame(
+    aminoacid = rep(aa, 5 * 7),
+    heptad = rep(seq_len(5), each = 7 * length(aa)),
+    position = rep(rep(letters[seq_len(7)], each = length(aa)), 5),
+    ppi = runif(n = 5 * 7 * length(aa), min = 0.4, max = 1.1)
+) %>%
+    dplyr::mutate(final_position = factor(paste0(heptad, position), 
+                                          levels = pos_levels))
+
+tibble(ppis)
+```
+
+
+## Create figure
+
+### Load packages
+```{r}
+#| label: load_packages
+
+library(ggplot2)
+library(cowplot)
+library(scales)
+library(ggh4x)
+```
+
+
+### Plot
+
+We start by generating a single heatmap of PPI values for each amino acid 
+mutation at each position. We illustrate two ways of generating 
+'hierarchical' labels for the x-axis, indicating both the heptad number and the 
+relative position within a heptad. 
+
+```{r}
+#| label: plot
+#| fig-width: 7
+#| fig-height: 4
+
+ggplot(ppis,
+       aes(x = position, y = aminoacid, fill = ppi)) + 
+    geom_tile() + 
+    theme_bw() + 
+    scale_fill_gradientn(colours = c("#811c11", "white", "#aecccb"), 
+                         values = rescale(c(0.4, 1, 1.1)),
+                         guide = "colorbar", limits = c(0.4, 1.1), 
+                         na.value = "white", 
+                         name = "PPI") + 
+    labs(x = "Position", y = "Amino acid") + 
+    facet_nested(. ~ heptad + position, space = 'free_x', 
+                 scales = 'free_x', switch = 'x') +
+    scale_x_discrete(expand = expansion(mult = c(0, 0))) + 
+    theme(axis.title = element_text(size = 16), 
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          strip.text = element_text(size = 14),
+          panel.spacing.x = unit(0, "line"), 
+          panel.border = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          strip.background = element_rect(fill = "white"))
+
+ggplot(ppis,
+       aes(x = position, y = aminoacid, fill = ppi)) + 
+    geom_tile() + 
+    theme_bw() + 
+    scale_fill_gradientn(colours = c("#811c11", "white", "#aecccb"), 
+                         values = rescale(c(0.4, 1, 1.1)),
+                         guide = "colorbar", limits = c(0.4, 1.1), 
+                         na.value = "white", 
+                         name = "PPI") + 
+    labs(x = "Position", y = "Amino acid") + 
+    facet_grid(. ~ heptad, space = 'free_x', scales = 'free_x', 
+               switch = 'x') +
+    scale_x_discrete(expand = expansion(mult = c(0, 0))) + 
+    theme(axis.title = element_text(size = 16), 
+          axis.ticks.x = element_blank(),
+          strip.text = element_text(size = 14),
+          panel.spacing.x = unit(0, "line"), 
+          panel.border = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          strip.background = element_rect(fill = "white"))
+```
+
+Next we generate a grid of many such heatmaps. The two plots below illustrate
+two different ways of displaying the faceting information in the plot.
+
+```{r}
+#| label: plot_combine
+#| fig-width: 7
+#| fig-height: 7
+
+nbr <- 10
+set.seed(123)
+nms <- vapply(seq_len(nbr), function(i) paste(sample(LETTERS, 5, replace = TRUE), 
+                                             collapse = ""), "")
+allpairs <- expand.grid(nms, nms)
+alldat <- do.call(bind_rows, lapply(seq_len(nrow(allpairs)), function(i) {
+    tmp <- ppis
+    tmp$ppi <- runif(nrow(ppis), min = 0.4, max = 1.1)
+    tmp$p1 <- allpairs[i, 1]
+    tmp$p2 <- allpairs[i, 2]
+    tmp
+}))
+
+ggplot(alldat,
+       aes(x = final_position, y = aminoacid, fill = ppi)) + 
+    geom_tile() + 
+    theme_bw() + 
+    scale_fill_gradientn(colours = c("#811c11", "white", "#aecccb"), 
+                         values = rescale(c(0.4, 1, 1.1)),
+                         guide = "colorbar", limits = c(0.4, 1.1), 
+                         na.value = "white", 
+                         name = "PPI") + 
+    facet_grid(p1 ~ p2, scales = "free", switch = "y") + 
+    labs(x = "", y = "") + 
+    scale_x_discrete(expand = expansion(mult = c(0, 0))) + 
+    theme(axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          panel.border = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          legend.position = "none",
+          strip.background = element_blank())
+
+axis_titles <- alldat %>%
+    dplyr::select(p1, p2) %>%
+    dplyr::distinct()
+ggplot(alldat) + 
+    geom_tile(aes(x = final_position, y = aminoacid, fill = ppi)) + 
+    theme_bw() + 
+    scale_fill_gradientn(colours = c("#811c11", "white", "#aecccb"), 
+                         values = rescale(c(0.4, 1, 1.1)),
+                         guide = "colorbar", limits = c(0.4, 1.1), 
+                         na.value = "white", 
+                         name = "PPI") + 
+    facet_grid(p1 ~ p2, scales = "free", switch = "y") + 
+    labs(x = NULL, y = NULL) + 
+    geom_text(data = axis_titles, aes(label = p2), 
+              hjust = 0.5, x = 35 / 2, y = -1, color = "grey10", size = 2) + 
+    geom_text(data = axis_titles, aes(label = p1), angle = 90, 
+              vjust = 0.5, x = -1, y = 21 / 2, color = "grey10", size = 2) + 
+    coord_cartesian(clip = "off") + 
+    theme(plot.margin = margin(b = 10, l = 10, r = 5, t = 5)) + 
+    scale_x_discrete(expand = expansion(mult = c(0, 0))) + 
+    theme(axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          panel.border = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          panel.spacing = unit(0.6, "line"), 
+          legend.position = "none",
+          strip.background = element_blank(),
+          strip.text = element_blank())
+```
+
+
+
+## Remarks
+
+* The combined plot could also have been generated with `cowplot` - however, 
+that is a lot more resource intensive. 
+
+## Session info
+
+```{r}
+#| label: session_info
+sessioninfo::session_info()
+```
