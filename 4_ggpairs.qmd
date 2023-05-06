@@ -1,0 +1,174 @@
+---
+title: "Pairwise scatter plots"
+author: "Charlotte Soneson, Michael Stadler"
+format:
+    html:
+        toc: true
+        toc-location: left
+        embed-resources: true
+        link-external-icon: true
+        code-fold: true
+editor_options: 
+    chunk_output_type: console
+---
+
+## Summary
+
+This document illustrates how to use `GGally` (a companion package to `ggplot2`) to:
+
+- make pairwise scatter plots of columns from a data set
+- customize the default panels
+
+
+## Prepare data
+
+Run the following code to prepare the data used in this document:
+
+```{r}
+#| label: prepare_data
+#| code-fold: false
+
+suppressPackageStartupMessages({
+    library(tibble)
+})
+
+# built-in `mtcars` dataset (see ?mtcars)
+# ... convert some columns to factors
+mycars <- mtcars
+mycars$engine_shape <- factor(c("0" = "V-shaped", "1" = "straight")[as.character(mycars$vs)])
+mycars$transmission <- factor(c("0" = "automatic", "1" = "manual")[as.character(mycars$am)])
+
+tibble(mycars)
+```
+
+
+## Create figure
+
+### Load packages
+```{r}
+#| label: load_packages
+
+library(ggplot2)
+library(GGally)
+```
+
+
+### Plot
+
+We start by creating a pairs plot with mostly default settings, displaying a 
+subset of the columns from `mycars`.
+
+```{r}
+#| label: plot
+#| fig-width: 7
+#| fig-height: 7
+
+ggpairs(mycars, 
+        columns = c("mpg", "disp", "hp", "wt", "transmission")) + 
+    theme_bw(13)
+```
+
+Next, we note that we can add mappings (aesthetics) to the panels, e.g. to 
+color by a variable.
+
+```{r}
+#| label: plot_color
+#| fig-width: 7
+#| fig-height: 7
+
+ggpairs(mycars, 
+        columns = c("mpg", "disp", "hp", "wt"),
+        mapping = aes(colour = transmission)) + 
+    theme_bw(13)
+```
+
+Specifying the mapping as above modifies all the panels in the pairs plot. 
+We can also customize individual panels. Here we illustrate this by coloring 
+the points in the panels below the diagonal and adding a regression line for 
+each group, but displaying only the overall correlation in the panels 
+above the diagonal. 
+
+```{r}
+#| label: plot_adapted
+#| fig-width: 7
+#| fig-height: 7
+
+## Define plot function for the scatter plots
+plotpoints <- function(data, mapping, ...) {
+    ggplot(data = data, mapping = mapping) +
+        aes(color = transmission) + 
+        geom_smooth(method = "lm", se = FALSE, 
+                    formula = "y ~ x",
+                    linetype = "dashed") + 
+        geom_point(alpha = 0.5, size = 3) +
+        theme_bw(13)
+}
+
+## Use these functions in the ggpairs call
+ggpairs(mycars, 
+        lower = list(continuous = plotpoints),
+        columns = c("mpg", "disp", "hp", "wt"),
+        progress = FALSE) + 
+    theme_bw(13) + 
+    labs(title = "A subset of the mtcars data set",
+         subtitle = "Lines represent linear regression")
+```
+
+We can also modify the panels above the diagonal to display the overall 
+correlation, but change the font size and add a background color according to 
+the strength of the correlation.
+
+```{r}
+## Define correlation function for the panels above the diagonal
+cor_fcn <- function(data, mapping, ...) {
+    ## Get data
+    xData <- GGally::eval_data_col(data, mapping$x)
+    yData <- GGally::eval_data_col(data, mapping$y)
+    
+    ## Calculate correlation
+    corr <- stats::cor(xData, yData, method = "pearson")
+    
+    ## Define background color
+    if (corr >= 0) {
+        cols <- grDevices::hcl.colors(n = 11, palette = "RdBu")[6:2]
+        col <- grDevices::rgb(grDevices::colorRamp(cols)(abs(corr)),
+                              maxColorValue = 255)
+    } else {
+        cols <- grDevices::hcl.colors(n = 11, palette = "RdBu")[6:10]
+        col <- grDevices::rgb(grDevices::colorRamp(cols)(abs(corr)),
+                              maxColorValue = 255)
+    }
+
+    ## Construct plot
+    ggplot(data = data, mapping = mapping) +
+        annotate(x = 0.5, y = 0.5, 
+                          label = paste0("Corr: ", round(corr, digits = 3)),
+                          geom = "text",
+                          size = abs(corr) * 5 + 2) +
+        theme_bw(13) + ylim(c(0, 1)) +
+        theme(panel.background = element_rect(fill = col),
+              panel.grid.major = element_blank(),
+              panel.grid.minor = element_blank())
+}
+
+ggpairs(mycars, 
+        lower = list(continuous = plotpoints),
+        upper = list(continuous = cor_fcn),
+        columns = c("mpg", "disp", "hp", "wt"),
+        progress = FALSE) + 
+    labs(title = "A subset of the mtcars data set",
+         subtitle = "Lines represent linear regression")
+```
+
+## Remarks
+
+* It is possible to define customized plots separately for continuous, 
+discrete and 'combo' data types, see the [ggpairs documentation](https://ggobi.github.io/ggally/articles/ggpairs.html) for more 
+details. 
+
+## Session info
+
+```{r}
+#| label: session_info
+sessioninfo::session_info()
+```
