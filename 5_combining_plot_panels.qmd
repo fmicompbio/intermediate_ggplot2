@@ -1,0 +1,133 @@
+---
+title: "Combining plots in a grid"
+author: "Charlotte Soneson, Michael Stadler"
+format:
+    html:
+        toc: true
+        toc-location: left
+        embed-resources: true
+        link-external-icon: true
+        code-fold: true
+editor_options: 
+    chunk_output_type: console
+---
+
+## Summary
+
+This document illustrates how to use `cowplot` (a companion package to `ggplot2`) to:
+
+- combine multiple panels into a single figure
+- include a non-ggplot2 panel and set a joint title for the figure
+
+
+## Prepare data
+
+Run the following code to prepare the data used in this document:
+
+```{r}
+#| label: prepare_data
+#| code-fold: false
+
+suppressPackageStartupMessages({
+    library(tibble)
+})
+
+# built-in `mtcars` dataset (see ?mtcars)
+# ... convert some columns to factors
+mycars <- mtcars
+mycars$model <- rownames(mycars)
+mycars$cyl <- factor(mycars$cyl, levels = c("4","6","8"))
+mycars$engine_shape <- factor(c("0" = "V-shaped", "1" = "straight")[as.character(mycars$vs)])
+mycars$transmission <- factor(c("0" = "automatic", "1" = "manual")[as.character(mycars$am)])
+
+tibble(mycars)
+```
+
+
+## Create figure
+
+### Load packages
+```{r}
+#| label: load_packages
+
+library(ggplot2)
+library(cowplot)
+```
+
+
+### Plot
+
+We first create the individual plots that we will later use as panels in the 
+combined plot. 
+
+```{r}
+#| label: plot
+#| fig-width: 5
+#| fig-height: 5
+
+p1 <- ggplot(data = mycars, mapping = aes(x = mpg, y = hp)) +
+    geom_point(size = 3, alpha = 0.5, aes(color = transmission)) +
+    labs(x = "Fuel efficiency (miles/gallon)", y = "Gross horsepower") +
+    theme_bw(13) +
+    theme(panel.grid = element_blank(),
+          legend.position = "bottom")
+p1
+p2 <- ggplot(data = mycars, mapping = aes(x = mpg)) +
+    geom_histogram(bins = 10, 
+                   color = "darkgrey", fill = "lightgrey") +
+    labs(x = "Fuel efficiency (miles/gallon)") +
+    theme_bw(13) +
+    theme(panel.grid = element_blank(),
+          legend.position = "bottom")
+p2
+p3 <- ggplot(data = mycars, mapping = aes(x = transmission, y = hp)) + 
+    geom_boxplot(outlier.size = -1) + 
+    geom_jitter(width = 0.2, height = 0, alpha = 0.5) + 
+    labs(x = "Transmission", y = "Gross horsepower") + 
+    theme_bw(13) + 
+    theme(panel.grid = element_blank(),
+          legend.position = "bottom")
+p3
+```
+
+Next we combine these plots into a single figure, including also a jpg image 
+of a puppy (which does not get a panel label). We set a single title for the 
+full plot. 
+
+```{r}
+#| label: plot_combine
+#| fig-width: 7
+#| fig-height: 7
+
+## Generate image object from jpg file
+img <- ggdraw() + 
+    draw_image("puppy-dog-1394586170ZjL.jpg")
+
+## Create a joint title
+jointtitle <- ggdraw() + 
+    draw_label("Combined plot title",
+               fontface = "bold", x = 0, hjust = 0)
+
+plot_grid(jointtitle, 
+          plot_grid(
+              p3, p1, img, p2, 
+              ncol = 2, labels = c("A", "B", "", "C"), 
+              align = "hv", axis = "tblr", rel_widths = c(0.5, 1)
+          ), 
+          ncol = 1, rel_heights = c(0.1, 1)
+)
+```
+
+
+## Remarks
+
+* If panels have a shared legend and we only wish to include it once, we 
+can extract it using `cowplot::get_legend()` and include it as a separate panel.
+* To include `ggpairs` panels, see the tips [here](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/intermediate_ggplot2.html#combining-plot-panels).
+
+## Session info
+
+```{r}
+#| label: session_info
+sessioninfo::session_info()
+```
