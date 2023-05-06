@@ -119,6 +119,10 @@ correlation, but change the font size and add a background color according to
 the strength of the correlation.
 
 ```{r}
+#| label: plot_adapted_correlation
+#| fig-width: 7
+#| fig-height: 7
+
 ## Define correlation function for the panels above the diagonal
 cor_fcn <- function(data, mapping, ...) {
     ## Get data
