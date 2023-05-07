@@ -35,8 +35,10 @@ suppressPackageStartupMessages({
 # built-in `mtcars` dataset (see ?mtcars)
 # ... convert some columns to factors
 mycars <- mtcars
-mycars$engine_shape <- factor(c("0" = "V-shaped", "1" = "straight")[as.character(mycars$vs)])
-mycars$transmission <- factor(c("0" = "automatic", "1" = "manual")[as.character(mycars$am)])
+mycars$engine_shape <- factor(
+    c("0" = "V-shaped", "1" = "straight")[as.character(mycars$vs)])
+mycars$transmission <- factor(
+    c("0" = "automatic", "1" = "manual")[as.character(mycars$am)])
 
 tibble(mycars)
 ```
@@ -133,6 +135,8 @@ cor_fcn <- function(data, mapping, ...) {
     corr <- stats::cor(xData, yData, method = "pearson")
     
     ## Define background color
+    ## The colorRamp() function creates a function that map the interval 
+    ## [0, 1] to colors
     if (corr >= 0) {
         cols <- grDevices::hcl.colors(n = 11, palette = "RdBu")[6:2]
         col <- grDevices::rgb(grDevices::colorRamp(cols)(abs(corr)),
@@ -146,10 +150,10 @@ cor_fcn <- function(data, mapping, ...) {
     ## Construct plot
     ggplot(data = data, mapping = mapping) +
         annotate(x = 0.5, y = 0.5, 
-                          label = paste0("Corr: ", round(corr, digits = 3)),
-                          geom = "text",
-                          size = abs(corr) * 5 + 2) +
-        theme_bw(13) + ylim(c(0, 1)) +
+                 label = paste0("Corr: ", round(corr, digits = 3)),
+                 geom = "text",
+                 size = abs(corr) * 5 + 1) +
+        theme_bw(13) + xlim(c(0, 1)) + ylim(c(0, 1)) +
         theme(panel.background = element_rect(fill = col),
               panel.grid.major = element_blank(),
               panel.grid.minor = element_blank())

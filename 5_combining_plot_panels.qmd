@@ -37,8 +37,10 @@ suppressPackageStartupMessages({
 mycars <- mtcars
 mycars$model <- rownames(mycars)
 mycars$cyl <- factor(mycars$cyl, levels = c("4","6","8"))
-mycars$engine_shape <- factor(c("0" = "V-shaped", "1" = "straight")[as.character(mycars$vs)])
-mycars$transmission <- factor(c("0" = "automatic", "1" = "manual")[as.character(mycars$am)])
+mycars$engine_shape <- factor(
+    c("0" = "V-shaped", "1" = "straight")[as.character(mycars$vs)])
+mycars$transmission <- factor(
+    c("0" = "automatic", "1" = "manual")[as.character(mycars$am)])
 
 tibble(mycars)
 ```
