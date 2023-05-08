@@ -14,7 +14,8 @@ editor_options:
 
 ## Summary
 
-This document illustrates how to use `ggplot2` to:
+This document illustrates how to use `systemfonts` and `ragg` together with
+`ggplot2` to:
 
 - make a plot that uses custom fonts
 - make a plot with error bars
@@ -68,6 +69,15 @@ knitr::opts_chunk$set(dev = "ragg_png")
 
 
 ### Get fonts
+We first need to make the fonts available to `R`. Either our desired font
+is already installed on the local system, or we can download
+one of the many free fonts available on the internet, for example from
+[https://fonts.google.com/](https://fonts.google.com/).
+
+The `systemfonts` package helps to list locally installed fonts that `R`
+can "see" or make a downloaded font file (typically a TrueType file) available
+to `R`.
+
 ```{r}
 #| label: get_fonts
 
@@ -83,16 +93,27 @@ systemfonts::registry_fonts()
 download.file(url = "https://github.com/huertatipografica/gochi-hand/archive/master.zip",
               destfile = file.path(tempdir(), "master.zip"))
 extracted_files <- unzip(file.path(tempdir(), "master.zip"), exdir = tempdir())
+# ...  we typically want a TrueType file (extension `.ttf`)
 ttf <- grep(".ttf$", extracted_files, value = TRUE)
 ttf
+# ... register the newly downloaded font for use in R
 systemfonts::register_font(name = "Gochi Hand", plain = ttf)
 # ... list the now registered fonts
 systemfonts::registry_fonts()
 ```
 
 ### Plot
+With the fonts available to `R`, we can now create plots that use custom
+fonts for some or all of the text elements. Fonts are defined by
+`element_text()` using the arguments `family` (see the `family` column returned
+by `systemfonts` functions) and `face` (one of "plain", "italic", "bold" or
+"bold.italic", see `style` column return by `systemfonts` functions).
+
 ```{r}
 #| label: plot
+
+# remember that this will only work if you have
+# activated the `ragg` backend to render the plots
 
 # create base plot
 p0 <- ggplot(data = mycars, mapping = aes(x = cyl)) +

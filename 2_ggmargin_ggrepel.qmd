@@ -14,7 +14,8 @@ editor_options:
 
 ## Summary
 
-This document illustrates how to use `ggplot2` to:
+This document illustrates how to use `ggExtra` and `ggrepel` together with
+`ggplot2` to:
 
 - make a scatter plot that shows densities of points in the margins
 - add labels to a scatter plot that do not overlap each other (repelling labels)
@@ -57,6 +58,9 @@ library(ggrepel)
 
 
 ### Plot
+Let's start with a simple scatter plot that we want to annotate with
+marginal distributions and labels.
+
 ```{r}
 #| label: plot
 #| fig-width: 7
@@ -72,6 +76,8 @@ p0 <- ggplot(data = mycars, mapping = aes(x = mpg, y = hp)) +
 p0
 ```
 
+Now we add marginal histograms to show the distribution of observations 
+when projected to the y- or x-axis.
 ```{r}
 #| label: plot_margin_hist
 #| fig-width: 7
@@ -81,6 +87,8 @@ p0
 ggMarginal(p0, type = "histogram", margins = "both", size = 4, bins = 7)
 ```
 
+We can also use density plots instead of histograms, and group our data,
+so that the distribution of each group is shown separately.
 ```{r}
 #| label: plot_margin_dens
 #| fig-width: 7
@@ -95,6 +103,8 @@ ggMarginal(p0 +
            groupFill = TRUE)
 ```
 
+Finally, we use violin plots to show marginal distributions and add
+labels to our observations.
 ```{r}
 #| label: plot_margin_violin_repel
 #| fig-width: 7
@@ -121,7 +131,7 @@ ggMarginal(p0 +
   supports different types of marginals (`type` argument): density, histogram,
   boxplot, violin, densigram.
 - [`ggrepel`](https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html)
-  provides to major functions to add labels to a `ggplot2` figure: `geom_text_repel()`
+  provides two major functions to add labels to a `ggplot2` figure: `geom_text_repel()`
   (the one we used above) just adds the labels, and `geom_label_repel()` which in
   addition draws a rectangle underneath the text, which may make the labels easier
   to read on crowded plots.

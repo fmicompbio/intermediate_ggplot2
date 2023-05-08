@@ -14,12 +14,12 @@ editor_options:
 
 ## Summary
 
-This document illustrates how to use `ggplot2` to:
+This document illustrates how to use `ggplot2` and `scattermore` to:
 
 - make a scatter plot with many data points that shows the density of points
   without saturation
-- that is fast to open and edit
-- that can be stored into file with a small size without loss in quality
+- that is fast to view and arrange (for example when assembling figure panels)
+- that can be stored into a compact file without loss in quality
 
 
 ## Prepare data
@@ -57,7 +57,7 @@ The `diamonds` dataset has `r nrow(diamonds)` observations. If stored
 into a vectorized graphics device such as `pdf()` or `svg()`, the file will be
 large (each observation is individually represented as graphic elements)
 and slow to open or arrange. Furthermore, the high number of data points
-leads to saturation and we do not see the underlying density of data points.
+leads to saturation and we do not see the full underlying density of data points.
 ```{r}
 #| label: plot
 #| fig-width: 7
@@ -73,7 +73,7 @@ p0 <- ggplot(data = diamonds, mapping = aes(x = carat, y = price)) +
 p0 + geom_point()
 ```
 
-A simple way to improve these issue is to use transparency, so that
+A simple way to improve the saturation issue is to use transparency, so that
 overlapping observations lead to darker colors. However, this does not
 solve the "many points" problem yet.
 
@@ -86,9 +86,9 @@ solve the "many points" problem yet.
 p0 + geom_point(color = alpha("black", 0.02))
 ```
 
-A simple way to solve also the "many points" problem is to not show
-all individual observations anymore, and instead show for example
-a heat map of the local density of points.
+A simple way to solve also the "many points" problem is to avoid showing
+all individual observations and instead show the local density of points
+using a color scale.
 
 ```{r}
 #| label: plot_2d_density
@@ -103,9 +103,10 @@ p0 + geom_density_2d_filled(bins = 48) +
 
 The linear contour levels or color intervals (controlled by `bins` or `breaks`)
 may not work well in a case like ours, where the density is very high in some
-regions and low in others. You can use `breaks` to create non-linear intervals
+regions that will occupy almost the complete color scale and we lose resoulution
+in low density regions. You can use `breaks` to create non-linear intervals
 (here combined with `ndensity` so that we know the range of densities: [0, 1])
-and with `panel.background` to make the zero-density area dark blue.
+and with `theme(panel.background)` to make the zero-density area dark blue.
 
 ```{r}
 #| label: plot_2d_density_nonlinearbreaks
@@ -120,9 +121,9 @@ p0 + geom_density_2d_filled(contour_var = "ndensity",
           panel.background = element_rect(fill = hcl.colors(64)[1]))
 ```
 
-Finally, if you really prefer to show individual observations and need
+Finally, if you prefer to show individual observations and need
 something that will scale to millions of points without getting slow or
-hard to use, there is a solution for that too.
+hard to use, `scattermore` provides a solution for that too.
 
 ```{r}
 #| label: plot_scattermore
@@ -138,13 +139,14 @@ p0 + geom_scattermore(pointsize = 2, alpha = 0.02)
 
 - [`scattermore`](https://github.com/exaexa/scattermore) does its magic by
   rendering the `geom_point` layer into a bitmap, while keeping all the other
-  layers as they are, allowing you to for example zoom into a plot and not
-  lose readability of the axes.
+  layers as they are, allowing you to create `pdf()` files that can be magnified
+  without losing readability of the axes.
 - [`scattermore`](https://github.com/exaexa/scattermore)
-  provides two `ggplot2` layers: `geom_scattermore()` (which behaves just like
-  `geom_point()`, and `geom_scattermost()` which avoids much of the overhead
-  and thus is even more efficient, at the price that it has a slightly different
-  interface and for example needs to get the data directly as the `xy` argument.
+  provides two `ggplot2` layers: `geom_scattermore()` (which behaves mostly like
+  `geom_point()`), and `geom_scattermost()` which avoids much of the overhead
+  of a normal ggplot2 layer and thus is even more efficient, at the price that
+  it has a slightly different interface and needs to get the data directly as
+  the `xy` argument.
 - An alternative, maybe even more convenient drop-in replacement for `geom_point()`
   and other `ggplot2` geoms that follows a similar strategy is `geom_point_rast()`
   from the [`ggrastr`](https://github.com/VPetukhov/ggrastr) package. This
