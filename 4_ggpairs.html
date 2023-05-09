@@ -2780,19 +2780,19 @@ vertical-align: -.125em;
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    yData <span class="ot">&lt;-</span> GGally<span class="sc">::</span><span class="fu">eval_data_col</span>(data, mapping<span class="sc">$</span>y)</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="do">## Calculate correlation</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    corr <span class="ot">&lt;-</span> <span class="fu">cor</span>(xData, yData, <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    corr <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">cor</span>(xData, yData, <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="do">## Define background color</span></span>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="do">## The colorRamp() function creates a function that map the interval </span></span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="do">## [0, 1] to colors</span></span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (corr <span class="sc">&gt;=</span> <span class="dv">0</span>) {</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        cols <span class="ot">&lt;-</span> <span class="fu">hcl.colors</span>(<span class="at">n =</span> <span class="dv">11</span>, <span class="at">palette =</span> <span class="st">&quot;RdBu&quot;</span>)[<span class="dv">6</span><span class="sc">:</span><span class="dv">2</span>]</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        col <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="fu">colorRamp</span>(cols)(<span class="fu">abs</span>(corr)),</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                   <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        cols <span class="ot">&lt;-</span> grDevices<span class="sc">::</span><span class="fu">hcl.colors</span>(<span class="at">n =</span> <span class="dv">11</span>, <span class="at">palette =</span> <span class="st">&quot;RdBu&quot;</span>)[<span class="dv">6</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        col <span class="ot">&lt;-</span> grDevices<span class="sc">::</span><span class="fu">rgb</span>(grDevices<span class="sc">::</span><span class="fu">colorRamp</span>(cols)(<span class="fu">abs</span>(corr)),</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                              <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        cols <span class="ot">&lt;-</span> <span class="fu">hcl.colors</span>(<span class="at">n =</span> <span class="dv">11</span>, <span class="at">palette =</span> <span class="st">&quot;RdBu&quot;</span>)[<span class="dv">6</span><span class="sc">:</span><span class="dv">10</span>]</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        col <span class="ot">&lt;-</span> <span class="fu">rgb</span>(<span class="fu">colorRamp</span>(cols)(<span class="fu">abs</span>(corr)),</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                   <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        cols <span class="ot">&lt;-</span> grDevices<span class="sc">::</span><span class="fu">hcl.colors</span>(<span class="at">n =</span> <span class="dv">11</span>, <span class="at">palette =</span> <span class="st">&quot;RdBu&quot;</span>)[<span class="dv">6</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        col <span class="ot">&lt;-</span> grDevices<span class="sc">::</span><span class="fu">rgb</span>(grDevices<span class="sc">::</span><span class="fu">colorRamp</span>(cols)(<span class="fu">abs</span>(corr)),</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                              <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span>
 <span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    }</span>
 <span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="do">## Construct plot</span></span>
@@ -2845,7 +2845,7 @@ vertical-align: -.125em;
  collate  en_US.UTF-8
  ctype    en_US.UTF-8
  tz       Europe/Zurich
- date     2023-05-09
+ date     2023-05-07
  pandoc   2.19.2 @ /usr/lib/rstudio-server/bin/quarto/bin/tools/ (via rmarkdown)
 
 ─ Packages ───────────────────────────────────────────────────────────────────
