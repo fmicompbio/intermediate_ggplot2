@@ -132,19 +132,19 @@ cor_fcn <- function(data, mapping, ...) {
     yData <- GGally::eval_data_col(data, mapping$y)
     
     ## Calculate correlation
-    corr <- stats::cor(xData, yData, method = "pearson")
+    corr <- cor(xData, yData, method = "pearson")
     
     ## Define background color
     ## The colorRamp() function creates a function that map the interval 
     ## [0, 1] to colors
     if (corr >= 0) {
-        cols <- grDevices::hcl.colors(n = 11, palette = "RdBu")[6:2]
-        col <- grDevices::rgb(grDevices::colorRamp(cols)(abs(corr)),
-                              maxColorValue = 255)
+        cols <- hcl.colors(n = 11, palette = "RdBu")[6:2]
+        col <- rgb(colorRamp(cols)(abs(corr)),
+                   maxColorValue = 255)
     } else {
-        cols <- grDevices::hcl.colors(n = 11, palette = "RdBu")[6:10]
-        col <- grDevices::rgb(grDevices::colorRamp(cols)(abs(corr)),
-                              maxColorValue = 255)
+        cols <- hcl.colors(n = 11, palette = "RdBu")[6:10]
+        col <- rgb(colorRamp(cols)(abs(corr)),
+                   maxColorValue = 255)
     }
 
     ## Construct plot
