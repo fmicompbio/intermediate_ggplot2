@@ -17,8 +17,9 @@ that is needed is installed on the FMI RStudio servers - connect to either
 [https://xenon8.fmi.ch/](https://xenon8.fmi.ch/) or [https://rstudio.fmi.ch/](https://rstudio.fmi.ch/)):
 
 ```{r, eval = FALSE}
-pkgs <- c("knitr", "rmarkdown", "dplyr", "ggplot2", "xaringan", "tidyr", "MASS",
-          "cowplot", "tidyverse", "stringi", "glue", "purrr", "magick")
+pkgs <- c("knitr", "rmarkdown", "ggplot2", "tibble", "dplyr", "ragg", 
+          "systemfonts", "sessioninfo", "ggExtra", "ggrepel", "scattermore",
+          "GGally", "cowplot", "tidyr", "scales", "ggh4x")
 install.packages("BiocManager")
 BiocManager::install(pkgs)
 ```
