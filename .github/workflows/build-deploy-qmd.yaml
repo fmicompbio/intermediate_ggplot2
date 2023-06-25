@@ -59,7 +59,7 @@ jobs:
                                  "ggtext", "ggnewscale", "ggrastr", "patchwork", 
                                  "cowplot", "plotly", "ggiraph", "RColorBrewer", 
                                  "circlize", "sessioninfo", "fueleconomy",
-                                 "scattermore", "colorspace"), 
+                                 "scattermore", "colorspace", "directlabels"), 
                                Ncpu = 2L)
         shell: Rscript {0}
 

@@ -45,6 +45,7 @@ suppressPackageStartupMessages({
     library(ggnewscale)
     library(ggrastr)
     library(scattermore)
+    library(directlabels)
     ## packages to combine multiple figures
     library(patchwork)
     library(cowplot)
@@ -733,6 +734,24 @@ ggplot(vehicles %>% dplyr::filter(year == 2005 & hwy > 30),
     ggp + 
     theme(panel.background = element_rect(fill = "gray88"))
 ```
+
+The `directlabels` package can be useful for adding direct labels to a plot, 
+typically replacing a legend. Labels can be added e.g. at the last point, first
+point or both. 
+
+```{r}
+ggplot(vehicles %>% 
+           dplyr::filter(class %in% c("Small Station Wagons", "Large Cars", 
+                                      "Vans, Passenger Type")) %>% 
+           dplyr::group_by(year, class) %>% 
+           dplyr::summarize(median_hwy = median(hwy), .groups = "drop"), 
+       aes(x = year, y = median_hwy, color = class)) + 
+    geom_line() + scale_colour_discrete(guide = "none") + 
+    scale_x_continuous(expand = expansion(add = c(1, 5.5))) + 
+    geom_dl(aes(label = class), method = list(dl.combine("last.points")), cex = 0.8) + 
+    ggp
+```
+
 
 Other packages that are useful for annotation of graphs are `geomtextpath`, 
 which allows adding curved text to `ggplot` objects, and `ggtext`, which 
