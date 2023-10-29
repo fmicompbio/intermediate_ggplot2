@@ -1194,6 +1194,7 @@ pw + plot_annotation(
 - [https://www.youtube.com/watch?v=8ikFe82Mb1I&ab_channel=R-LadiesTunis](https://www.youtube.com/watch?v=8ikFe82Mb1I&ab_channel=R-LadiesTunis)
 - [https://stulp.gmw.rug.nl/ggplotworkshop/advancedggplot.html#showing-all-data-in-facets](https://stulp.gmw.rug.nl/ggplotworkshop/advancedggplot.html#showing-all-data-in-facets)
 - [https://stackoverflow.com/questions/61922380/preserve-location-of-missing-columns-in-combined-bar-plot](https://stackoverflow.com/questions/61922380/preserve-location-of-missing-columns-in-combined-bar-plot)
+- [https://lpembleton.rbind.io/ramblings/r/](https://lpembleton.rbind.io/ramblings/r/)
 
 # Session info
 
