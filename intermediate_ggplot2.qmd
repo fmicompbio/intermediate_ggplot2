@@ -1195,6 +1195,8 @@ pw + plot_annotation(
 - [https://stulp.gmw.rug.nl/ggplotworkshop/advancedggplot.html#showing-all-data-in-facets](https://stulp.gmw.rug.nl/ggplotworkshop/advancedggplot.html#showing-all-data-in-facets)
 - [https://stackoverflow.com/questions/61922380/preserve-location-of-missing-columns-in-combined-bar-plot](https://stackoverflow.com/questions/61922380/preserve-location-of-missing-columns-in-combined-bar-plot)
 - [https://lpembleton.rbind.io/ramblings/r/](https://lpembleton.rbind.io/ramblings/r/)
+- [Exciting data visualizations with ggplot2 extensions](https://z3tt.github.io/exciting-extensions/slides.html#/title-slide)
+- [Awesome ggplot2](https://github.com/erikgahner/awesome-ggplot2/)
 
 # Session info
 
