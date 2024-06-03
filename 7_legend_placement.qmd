@@ -1,0 +1,120 @@
+---
+title: "Placing legends"
+author: "Charlotte Soneson"
+format:
+    html:
+        toc: true
+        toc-location: left
+        embed-resources: true
+        link-external-icon: true
+        code-fold: true
+editor_options: 
+    chunk_output_type: console
+---
+
+## Summary
+
+This document illustrates how to place legends in different positions in a 
+`ggplot`.
+
+
+## Prepare data
+
+Run the following code to load the data used in this document:
+
+```{r}
+#| label: prepare_data
+#| code-fold: false
+
+suppressPackageStartupMessages({
+    library(dplyr)
+    library(tibble)
+    library(swissknife)
+    library(ggplot2)
+})
+
+loadExampleData("mycars")
+
+tibble(mycars)
+```
+
+
+## Step 1 - construct basic plot
+
+```{r}
+#| label: make_basic_plot
+
+gg <- ggplot(mycars, 
+             aes(x = mpg, y = disp, color = cyl)) + 
+    geom_point(size = 4) +
+    scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
+                                  `8` = "forestgreen"), 
+                       name = "Number of\ncylinders") + 
+    labs(x = "Miles/gallon", y = "Displacement") + 
+    theme_bw(base_size = 13)
+gg
+```
+
+## Step 2 - move legend to the bottom
+
+```{r}
+#| label: legend_bottom
+
+gg + theme(legend.position = "bottom")
+```
+
+## Step 3 - move legend inside the canvas (top right corner)
+
+```{r}
+#| label: legend_inside
+
+gg + theme(legend.position = "inside",
+           legend.position.inside = c(0.85, 0.85),
+           legend.background = element_rect(color = "black"),
+           legend.title.position = "left")
+```
+
+## Step 4 - hide specific legend
+
+Use the `cyl` column for both color and shape, but only show the legend for 
+the shape. 
+
+```{r}
+#| label: hide_one_legend
+
+ggplot(mycars, 
+       aes(x = mpg, y = disp, color = cyl, shape = cyl)) + 
+    geom_point(size = 4) +
+    scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
+                                  `8` = "forestgreen"), 
+                       name = "Number of\ncylinders") + 
+    labs(x = "Miles/gallon", y = "Displacement") + 
+    theme_bw(base_size = 13) + 
+    guides(color = "none", 
+           shape = guide_legend(title = "Number of\ncylinders"))
+```
+
+## Step 5 - place different legends in different positions
+
+```{r}
+ggplot(mycars, 
+       aes(x = mpg, y = disp, color = gear, shape = cyl)) + 
+    geom_point(size = 4) +
+    scale_color_continuous(name = "Number of\ngears") + 
+    scale_shape_discrete(name = "Number of\ncylinders") + 
+    labs(x = "Miles/gallon", y = "Displacement") + 
+    theme_bw(base_size = 13) + 
+    guides(color = guide_colorbar(position = "right"), 
+           shape = guide_legend(position = "bottom"))
+```
+
+## Links
+
+* Legends in `ggplot2` 3.5.0: [https://www.tidyverse.org/blog/2024/02/ggplot2-3-5-0-legends/](https://www.tidyverse.org/blog/2024/02/ggplot2-3-5-0-legends/)
+
+## Session info
+
+```{r}
+#| label: session_info
+sessioninfo::session_info()
+```
