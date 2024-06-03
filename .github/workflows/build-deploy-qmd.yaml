@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: ubuntu-latest, r: '4.2' }
+          - { os: ubuntu-latest, r: '4.4' }
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -75,11 +75,6 @@ jobs:
           quarto::quarto_render("intermediate_ggplot2.qmd")
         shell: Rscript {0}
     
-      - name: Render index page
-        run: |
-          rmarkdown::render(input = "index.Rmd", clean = FALSE)
-        shell: Rscript {0}
-
       - name: Prepare files to deploy
         run: |
           mkdir _site
