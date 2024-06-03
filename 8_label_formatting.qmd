@@ -1,0 +1,97 @@
+---
+title: "Advanced labels"
+author: "Charlotte Soneson"
+format:
+    html:
+        toc: true
+        toc-location: left
+        embed-resources: true
+        link-external-icon: true
+        code-fold: true
+editor_options: 
+    chunk_output_type: console
+---
+
+## Summary
+
+This document illustrates how to format various types of labels.
+
+
+## Prepare data
+
+Run the following code to load the data used in this document:
+
+```{r}
+#| label: prepare_data
+#| code-fold: false
+
+suppressPackageStartupMessages({
+    library(dplyr)
+    library(tibble)
+    library(swissknife)
+    library(ggplot2)
+    library(ggtext)
+    library(marquee)
+    library(ggrepel)
+})
+
+loadExampleData("mycars")
+
+tibble(mycars)
+```
+
+
+## Step 1 - construct basic plot
+
+```{r}
+#| label: make_basic_plot
+
+gg <- ggplot(mycars, 
+             aes(x = mpg, y = disp, color = cyl)) + 
+    geom_point(size = 4) +
+    scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
+                                  `8` = "forestgreen"), 
+                       name = "Number of\ncylinders") + 
+    labs(x = "Miles/gallon", y = "Displacement") + 
+    theme_bw(base_size = 13)
+gg
+```
+
+## Step 2 - add labels to points
+
+```{r}
+ggplot(mycars |>
+           rownames_to_column("car"), 
+       aes(x = mpg, y = disp, color = cyl, label = car)) + 
+    geom_point(size = 4) +
+    geom_text_repel(min.segment.length = 0, max.overlaps = Inf) + 
+    scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
+                                  `8` = "forestgreen"), 
+                       name = "Number of\ncylinders") + 
+    labs(x = "Miles/gallon", y = "Displacement") + 
+    theme_bw(base_size = 13)
+```
+
+## Step 3 - format axis labels using markdown
+
+```{r}
+ggplot(mycars |>
+           rownames_to_column("car"), 
+       aes(x = mpg, y = disp, color = cyl, label = car)) + 
+    geom_point(size = 4) +
+    geom_text_repel(min.segment.length = 0, max.overlaps = Inf) + 
+    scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
+                                  `8` = "forestgreen"), 
+                       name = "Number of\ncylinders") + 
+    labs(x = "_Miles/gallon_ (**mpg**)", y = "Displacement (in<sup>3</sup>)") + 
+    theme_bw(base_size = 13) + 
+    theme(axis.title = element_markdown())
+```
+
+
+## Session info
+
+```{r}
+#| label: session_info
+sessioninfo::session_info()
+```
