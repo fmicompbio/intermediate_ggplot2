@@ -1,0 +1,35 @@
+---
+title: "Intermediate ggplot2 workshop 2023"
+output:
+  rmarkdown::html_document:
+    theme: united
+    highlight: pygments
+    toc: false
+    fig_width: 5
+editor_options: 
+  chunk_output_type: console
+---
+
+This page contains links to material for the FMI intermediate workshop on [ggplot2](https://ggplot2.tidyverse.org/).
+
+To follow the workshop, the following packages need to be installed (everything 
+that is needed is installed on the FMI RStudio servers:
+
+```{r, eval = FALSE}
+pkgs <- c("knitr", "rmarkdown", "ggplot2", "tibble", "dplyr", "ragg", 
+          "systemfonts", "sessioninfo", "ggExtra", "ggrepel", "scattermore",
+          "GGally", "cowplot", "tidyr", "scales", "ggh4x")
+install.packages("BiocManager")
+BiocManager::install(pkgs)
+```
+
+
+* [Tips and tricks](https://fmicompbio.github.io/intermediate_ggplot2/intermediate_ggplot2.html)
+* [1 - Using custom fonts; plots with error bars](https://fmicompbio.github.io/intermediate_ggplot2/1_fonts_errbars.html)
+* [2 - Scatterplots with marginal densities and repelling labels](https://fmicompbio.github.io/intermediate_ggplot2/2_ggmargin_ggrepel.html)
+* [3 - Scatterplots with *many* points](https://fmicompbio.github.io/intermediate_ggplot2/3_many_points_scatterplot.html)
+* [4 - Pairwise scatter plots](https://fmicompbio.github.io/intermediate_ggplot2/4_ggpairs.html)
+* [5 - Combining plots in a grid](https://fmicompbio.github.io/intermediate_ggplot2/5_combining_plot_panels.html)
+* [6 - Creating customized heatmaps and combining them in a single figure](https://fmicompbio.github.io/intermediate_ggplot2/6_ppi_heatmaps.html)
+
+

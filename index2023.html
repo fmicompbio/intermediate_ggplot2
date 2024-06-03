@@ -11,7 +11,7 @@
 
 
 
-<title>Intermediate ggplot2 workshop</title>
+<title>Intermediate ggplot2 workshop 2023</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -225,6 +225,107 @@ ul.task-list{list-style: none;}
 
 
 
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -325,20 +426,36 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Intermediate ggplot2 workshop</h1>
+<h1 class="title toc-ignore">Intermediate ggplot2 workshop 2023</h1>
 
 </div>
 
 
 <p>This page contains links to material for the FMI intermediate
 workshop on <a href="https://ggplot2.tidyverse.org/">ggplot2</a>.</p>
+<p>To follow the workshop, the following packages need to be installed
+(everything that is needed is installed on the FMI RStudio servers:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;rmarkdown&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;tibble&quot;</span>, <span class="st">&quot;dplyr&quot;</span>, <span class="st">&quot;ragg&quot;</span>, </span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>          <span class="st">&quot;systemfonts&quot;</span>, <span class="st">&quot;sessioninfo&quot;</span>, <span class="st">&quot;ggExtra&quot;</span>, <span class="st">&quot;ggrepel&quot;</span>, <span class="st">&quot;scattermore&quot;</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>          <span class="st">&quot;GGally&quot;</span>, <span class="st">&quot;cowplot&quot;</span>, <span class="st">&quot;tidyr&quot;</span>, <span class="st">&quot;scales&quot;</span>, <span class="st">&quot;ggh4x&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(pkgs)</span></code></pre></div>
 <ul>
-<li><p><a href="https://fmicompbio.github.io/intermediate_ggplot2/index2024.html">2024
-session</a></p></li>
-<li><p><a href="https://fmicompbio.github.io/intermediate_ggplot2/index2023.html">2023
-session</a></p></li>
-<li><p><a href="https://fmicompbio.github.io/intermediate_ggplot2/intermediate_ggplot2.html">Tips
-and tricks</a></p></li>
+<li><a href="https://fmicompbio.github.io/intermediate_ggplot2/intermediate_ggplot2.html">Tips
+and tricks</a></li>
+<li><a href="https://fmicompbio.github.io/intermediate_ggplot2/1_fonts_errbars.html">1
+- Using custom fonts; plots with error bars</a></li>
+<li><a href="https://fmicompbio.github.io/intermediate_ggplot2/2_ggmargin_ggrepel.html">2
+- Scatterplots with marginal densities and repelling labels</a></li>
+<li><a href="https://fmicompbio.github.io/intermediate_ggplot2/3_many_points_scatterplot.html">3
+- Scatterplots with <em>many</em> points</a></li>
+<li><a href="https://fmicompbio.github.io/intermediate_ggplot2/4_ggpairs.html">4
+- Pairwise scatter plots</a></li>
+<li><a href="https://fmicompbio.github.io/intermediate_ggplot2/5_combining_plot_panels.html">5
+- Combining plots in a grid</a></li>
+<li><a href="https://fmicompbio.github.io/intermediate_ggplot2/6_ppi_heatmaps.html">6
+- Creating customized heatmaps and combining them in a single
+figure</a></li>
 </ul>
 
 

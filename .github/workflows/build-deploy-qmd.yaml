@@ -84,6 +84,8 @@ jobs:
         run: |
           mkdir _site
           cp -r index.html _site/
+          cp -r index2024.html _site/
+          cp -r index2023.html _site/
           cp -r intermediate_ggplot2_files intermediate_ggplot2.html _site/
           cp -r 1_fonts_errbars.html _site/
           cp -r 2_ggmargin_ggrepel.html _site/

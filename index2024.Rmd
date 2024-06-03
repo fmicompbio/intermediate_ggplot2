@@ -1,0 +1,32 @@
+---
+title: "Intermediate ggplot2 workshop 2024"
+output:
+  rmarkdown::html_document:
+    theme: united
+    highlight: pygments
+    toc: false
+    fig_width: 5
+editor_options: 
+  chunk_output_type: console
+---
+
+This page contains links to material for the FMI intermediate workshop on [ggplot2](https://ggplot2.tidyverse.org/).
+
+To follow the workshop, the following packages need to be installed (everything 
+that is needed is installed on the FMI RStudio servers:
+
+```{r, eval = FALSE}
+pkgs <- c("knitr", "rmarkdown", "ggplot2", "tibble", "dplyr", "ragg", 
+          "systemfonts", "sessioninfo", "ggExtra", "ggrepel", "scattermore",
+          "GGally", "cowplot", "tidyr", "scales", "ggh4x")
+install.packages("BiocManager")
+BiocManager::install(pkgs)
+```
+
+
+* [Tips and tricks](https://fmicompbio.github.io/intermediate_ggplot2/intermediate_ggplot2.html)
+* [Scatterplots with *many* points](https://fmicompbio.github.io/intermediate_ggplot2/3_many_points_scatterplot.html)
+* [Pairwise scatter plots](https://fmicompbio.github.io/intermediate_ggplot2/4_ggpairs.html)
+* [Combining plots in a grid](https://fmicompbio.github.io/intermediate_ggplot2/5_combining_plot_panels.html)
+
+

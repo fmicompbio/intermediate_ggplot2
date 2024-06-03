@@ -1,5 +1,5 @@
 ---
-title: "Intermediate ggplot2 workshop 2023"
+title: "Intermediate ggplot2 workshop"
 output:
   rmarkdown::html_document:
     theme: united
@@ -12,25 +12,7 @@ editor_options:
 
 This page contains links to material for the FMI intermediate workshop on [ggplot2](https://ggplot2.tidyverse.org/).
 
-To follow the workshop, the following packages need to be installed (everything 
-that is needed is installed on the FMI RStudio servers - connect to either 
-[https://xenon8.fmi.ch/](https://xenon8.fmi.ch/) or [https://rstudio.fmi.ch/](https://rstudio.fmi.ch/)):
+* [2024 session](https://fmicompbio.github.io/intermediate_ggplot2/index2024.html)
+* [2023 session](https://fmicompbio.github.io/intermediate_ggplot2/index2023.html)
 
-```{r, eval = FALSE}
-pkgs <- c("knitr", "rmarkdown", "ggplot2", "tibble", "dplyr", "ragg", 
-          "systemfonts", "sessioninfo", "ggExtra", "ggrepel", "scattermore",
-          "GGally", "cowplot", "tidyr", "scales", "ggh4x")
-install.packages("BiocManager")
-BiocManager::install(pkgs)
-```
-
-
-* [Tips and tricks](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/intermediate_ggplot2.html)
-* [1 - Using custom fonts; plots with error bars](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/1_fonts_errbars.html)
-* [2 - Scatterplots with marginal densities and repelling labels](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/2_ggmargin_ggrepel.html)
-* [3 - Scatterplots with *many* points](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/3_many_points_scatterplot.html)
-* [4 - Pairwise scatter plots](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/4_ggpairs.html)
-* [5 - Combining plots in a grid](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/5_combining_plot_panels.html)
-* [6 - Creating customized heatmaps and combining them in a single figure](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/6_ppi_heatmaps.html)
-
-
+* [Tips and tricks](https://fmicompbio.github.io/intermediate_ggplot2/intermediate_ggplot2.html)
