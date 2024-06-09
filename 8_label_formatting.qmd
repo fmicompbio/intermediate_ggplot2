@@ -1,6 +1,6 @@
 ---
-title: "Advanced labels"
-author: "Charlotte Soneson"
+title: "Formatting axis labels"
+author: "Charlotte Soneson, Michael Stadler"
 format:
     html:
         toc: true
@@ -14,12 +14,13 @@ editor_options:
 
 ## Summary
 
-This document illustrates how to format various types of labels.
-
+This document provides some examples of how to format various types of labels 
+in `ggplot2` plots. 
 
 ## Prepare data
 
-Run the following code to load the data used in this document:
+Run the following code to load the packages and data that are used in this 
+document:
 
 ```{r}
 #| label: prepare_data
@@ -31,37 +32,43 @@ suppressPackageStartupMessages({
     library(swissknife)
     library(ggplot2)
     library(ggtext)
-    library(marquee)
     library(ggrepel)
 })
 
 loadExampleData("mycars")
 
+mycars <- mycars |>
+    rownames_to_column("car")
+
 tibble(mycars)
 ```
 
-
 ## Step 1 - construct basic plot
+
+Using the `mycars` data, create the following basic plot. 
 
 ```{r}
 #| label: make_basic_plot
 
-gg <- ggplot(mycars, 
-             aes(x = mpg, y = disp, color = cyl)) + 
+ggplot(mycars, 
+       aes(x = mpg, y = disp, color = cyl)) + 
     geom_point(size = 4) +
     scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
                                   `8` = "forestgreen"), 
                        name = "Number of\ncylinders") + 
     labs(x = "Miles/gallon", y = "Displacement") + 
     theme_bw(base_size = 13)
-gg
 ```
 
 ## Step 2 - add labels to points
 
+The first extension we will make to the basic plot is to add a label to each 
+point. We will use the `car` column. Note that the labels are added in such a 
+way that they do not overlap (more precisely, different labels are designed to 
+repel each other to avoid overlaps whenever possible).
+
 ```{r}
-ggplot(mycars |>
-           rownames_to_column("car"), 
+ggplot(mycars, 
        aes(x = mpg, y = disp, color = cyl, label = car)) + 
     geom_point(size = 4) +
     geom_text_repel(min.segment.length = 0, max.overlaps = Inf) + 
@@ -74,9 +81,14 @@ ggplot(mycars |>
 
 ## Step 3 - format axis labels using markdown
 
+Next, we turn our attention to the axis labels. The `ggtext` package provides 
+functionality to format the axes (or other text elements) using _markdown_. 
+Use this functionality to add formatting (italics and bold) to the x-axis title, 
+and add a unit to the y-axis title (here, it is helpful to note that HTML
+code can be interpreted by markdown).
+
 ```{r}
-ggplot(mycars |>
-           rownames_to_column("car"), 
+ggplot(mycars, 
        aes(x = mpg, y = disp, color = cyl, label = car)) + 
     geom_point(size = 4) +
     geom_text_repel(min.segment.length = 0, max.overlaps = Inf) + 
@@ -88,6 +100,46 @@ ggplot(mycars |>
     theme(axis.title = element_markdown())
 ```
 
+## Step 4 - add special characters to labels
+
+Next, we will change the axis titles completely (the x-axis title to $\alpha$,
+and the y-axis title to $\beta^4$). Note that these labels don't necessarily 
+make much sense in this case, but they serve as a useful example for general 
+special characters. We can achieve our goal in several ways - for example, 
+using the R `expression()` function:
+
+```{r}
+## Using expression
+ggplot(mycars, 
+       aes(x = mpg, y = disp, color = cyl, label = car)) + 
+    geom_point(size = 4) +
+    geom_text_repel(min.segment.length = 0, max.overlaps = Inf) + 
+    scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
+                                  `8` = "forestgreen"), 
+                       name = "Number of\ncylinders") + 
+    labs(x = expression(~ alpha), y = expression(~ beta ^ 4)) + 
+    theme_bw(base_size = 13)
+```
+
+or by using 
+[Unicode characters](https://en.wikipedia.org/wiki/List_of_Unicode_characters#) 
+characters (note that these may not be properly displayed unless the plot 
+backend is set to Cairo):
+
+```{r}
+#| dev: CairoPNG
+
+## Using Unicode
+ggplot(mycars, 
+       aes(x = mpg, y = disp, color = cyl, label = car)) + 
+    geom_point(size = 4) +
+    geom_text_repel(min.segment.length = 0, max.overlaps = Inf) + 
+    scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
+                                  `8` = "forestgreen"), 
+                       name = "Number of\ncylinders") + 
+    labs(x = "\U03B1", y = "\U03B2\U2074") + 
+    theme_bw(base_size = 13)
+```
 
 ## Session info
 

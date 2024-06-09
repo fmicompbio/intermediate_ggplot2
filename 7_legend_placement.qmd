@@ -1,6 +1,6 @@
 ---
 title: "Placing legends"
-author: "Charlotte Soneson"
+author: "Michael Stadler, Charlotte Soneson"
 format:
     html:
         toc: true
