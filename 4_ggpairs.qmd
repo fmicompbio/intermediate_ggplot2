@@ -22,7 +22,7 @@ This document illustrates how to use `GGally` (a companion package to `ggplot2`)
 
 ## Prepare data
 
-Run the following code to prepare the data used in this document:
+Run the following code to load the packages and data used in this document:
 
 ```{r}
 #| label: prepare_data
@@ -30,35 +30,20 @@ Run the following code to prepare the data used in this document:
 
 suppressPackageStartupMessages({
     library(tibble)
+    library(ggplot2)
+    library(GGally)
+    library(swissknife)
 })
 
-# built-in `mtcars` dataset (see ?mtcars)
-# ... convert some columns to factors
-mycars <- mtcars
-mycars$engine_shape <- factor(
-    c("0" = "V-shaped", "1" = "straight")[as.character(mycars$vs)])
-mycars$transmission <- factor(
-    c("0" = "automatic", "1" = "manual")[as.character(mycars$am)])
+loadExampleData("mycars")
 
 tibble(mycars)
 ```
 
+## Create basic pairs plot
 
-## Create figure
-
-### Load packages
-```{r}
-#| label: load_packages
-
-library(ggplot2)
-library(GGally)
-```
-
-
-### Plot
-
-We start by creating a pairs plot with mostly default settings, displaying a 
-subset of the columns from `mycars`.
+We start by using the `GGally::ggpairs()` function to create a pairs plot with 
+mostly default settings, displaying a subset of the columns from `mycars`.
 
 ```{r}
 #| label: plot
@@ -69,6 +54,8 @@ ggpairs(mycars,
         columns = c("mpg", "disp", "hp", "wt", "transmission")) + 
     theme_bw(13)
 ```
+
+## Add aesthetics to the panels
 
 Next, we note that we can add mappings (aesthetics) to the panels, e.g. to 
 color by a variable.
@@ -83,6 +70,8 @@ ggpairs(mycars,
         mapping = aes(colour = transmission)) + 
     theme_bw(13)
 ```
+
+## Customize individual panels
 
 Specifying the mapping as above modifies all the panels in the pairs plot. 
 We can also customize individual panels. Here we illustrate this by coloring 
