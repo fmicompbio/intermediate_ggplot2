@@ -30,34 +30,21 @@ Run the following code to prepare the data used in this document:
 
 suppressPackageStartupMessages({
     library(tibble)
+    library(swissknife)
+    library(ggplot2)
+    library(cowplot)
+    library(patchwork)
 })
 
-# built-in `mtcars` dataset (see ?mtcars)
-# ... convert some columns to factors
-mycars <- mtcars
-mycars$model <- rownames(mycars)
-mycars$cyl <- factor(mycars$cyl, levels = c("4","6","8"))
-mycars$engine_shape <- factor(
-    c("0" = "V-shaped", "1" = "straight")[as.character(mycars$vs)])
-mycars$transmission <- factor(
-    c("0" = "automatic", "1" = "manual")[as.character(mycars$am)])
+loadExampleData("mycars")
+
+mycars <- mycars |>
+    rownames_to_column("car")
 
 tibble(mycars)
 ```
 
-
-## Create figure
-
-### Load packages
-```{r}
-#| label: load_packages
-
-library(ggplot2)
-library(cowplot)
-```
-
-
-### Plot
+## Create individual panels
 
 We first create the individual plots that we will later use as panels in the 
 combined plot. 
@@ -92,18 +79,20 @@ p3 <- ggplot(data = mycars, mapping = aes(x = transmission, y = hp)) +
 p3
 ```
 
+## Combine panels into final figure (cowplot)
+
 Next we combine these plots into a single figure, including also a jpg image 
 of a puppy (which does not get a panel label). We set a single title for the 
 full plot. 
 
 ```{r}
-#| label: plot_combine
+#| label: plot_combine_cowplot
 #| fig-width: 7
 #| fig-height: 7
 
 ## Generate image object from jpg file
 img <- ggdraw() + 
-    draw_image("puppy-dog-1394586170ZjL.jpg")
+    draw_image("https://publicdomainvectors.org/photos/johnny_automatic_puppy.png")
 
 ## Create a joint title
 jointtitle <- ggdraw() + 
@@ -118,6 +107,23 @@ plot_grid(jointtitle,
           ), 
           ncol = 1, rel_heights = c(0.1, 1)
 )
+```
+
+## Combine panels into final figure (patchwork)
+
+Here we create the same combined figure, but now using `patchwork` rather than 
+`cowplot`. 
+
+```{r}
+#| label: plot_combine_patchwork
+#| fig-width: 7
+#| fig-height: 7
+
+wrap_plots(p3, p1, img, p2, ncol = 2) + 
+    plot_layout(widths = c(0.5, 1)) + 
+    plot_annotation(tag_levels = list(c("A", "B", "", "C")), 
+                    title = "Combined plot title")
+
 ```
 
 
