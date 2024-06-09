@@ -43,7 +43,7 @@ mycars <- mycars |>
 tibble(mycars)
 ```
 
-## Step 1 - construct basic plot
+## Construct basic plot
 
 Using the `mycars` data, create the following basic plot. 
 
@@ -60,7 +60,7 @@ ggplot(mycars,
     theme_bw(base_size = 13)
 ```
 
-## Step 2 - add labels to points
+## Add labels to points
 
 The first extension we will make to the basic plot is to add a label to each 
 point. We will use the `car` column. Note that the labels are added in such a 
@@ -79,7 +79,7 @@ ggplot(mycars,
     theme_bw(base_size = 13)
 ```
 
-## Step 3 - format axis labels using markdown
+## Format axis labels using markdown
 
 Next, we turn our attention to the axis labels. The `ggtext` package provides 
 functionality to format the axes (or other text elements) using _markdown_. 
@@ -100,7 +100,7 @@ ggplot(mycars,
     theme(axis.title = element_markdown())
 ```
 
-## Step 4 - add special characters to labels
+## Add special characters to labels
 
 Next, we will change the axis titles completely (the x-axis title to $\alpha$,
 and the y-axis title to $\beta^4$). Note that these labels don't necessarily 
