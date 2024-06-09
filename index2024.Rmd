@@ -28,5 +28,7 @@ BiocManager::install(pkgs)
 * [Scatterplots with *many* points](https://fmicompbio.github.io/intermediate_ggplot2/3_many_points_scatterplot.html)
 * [Pairwise scatter plots](https://fmicompbio.github.io/intermediate_ggplot2/4_ggpairs.html)
 * [Combining plots in a grid](https://fmicompbio.github.io/intermediate_ggplot2/5_combining_plot_panels.html)
+* [Legend placement](https://fmicompbio.github.io/intermediate_ggplot2/7_legend_placement.html)
+* [Label formatting](https://fmicompbio.github.io/intermediate_ggplot2/8_label_formatting.html)
 
 
