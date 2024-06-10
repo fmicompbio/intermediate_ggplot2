@@ -95,7 +95,7 @@ plotpoints <- function(data, mapping, ...) {
         theme_bw(13)
 }
 
-## Use these functions in the ggpairs call
+## Use this function in the ggpairs call
 ggpairs(mycars, 
         lower = list(continuous = plotpoints),
         columns = c("mpg", "disp", "hp", "wt"),

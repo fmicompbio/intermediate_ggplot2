@@ -38,7 +38,7 @@ suppressPackageStartupMessages({
 loadExampleData("mycars")
 
 mycars <- mycars |>
-    rownames_to_column("car")
+    rownames_to_column("model")
 
 tibble(mycars)
 ```
@@ -63,13 +63,13 @@ ggplot(mycars,
 ## Add labels to points
 
 The first extension we will make to the basic plot is to add a label to each 
-point. We will use the `car` column. Note that the labels are added in such a 
+point. We will use the `model` column. Note that the labels are added in such a 
 way that they do not overlap (more precisely, different labels are designed to 
 repel each other to avoid overlaps whenever possible).
 
 ```{r}
 ggplot(mycars, 
-       aes(x = mpg, y = disp, color = cyl, label = car)) + 
+       aes(x = mpg, y = disp, color = cyl, label = model)) + 
     geom_point(size = 4) +
     geom_text_repel(min.segment.length = 0, max.overlaps = Inf) + 
     scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
@@ -89,7 +89,7 @@ code can be interpreted by markdown).
 
 ```{r}
 ggplot(mycars, 
-       aes(x = mpg, y = disp, color = cyl, label = car)) + 
+       aes(x = mpg, y = disp, color = cyl, label = model)) + 
     geom_point(size = 4) +
     geom_text_repel(min.segment.length = 0, max.overlaps = Inf) + 
     scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
@@ -111,7 +111,7 @@ using the R `expression()` function:
 ```{r}
 ## Using expression
 ggplot(mycars, 
-       aes(x = mpg, y = disp, color = cyl, label = car)) + 
+       aes(x = mpg, y = disp, color = cyl, label = model)) + 
     geom_point(size = 4) +
     geom_text_repel(min.segment.length = 0, max.overlaps = Inf) + 
     scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
@@ -131,7 +131,7 @@ backend is set to Cairo):
 
 ## Using Unicode
 ggplot(mycars, 
-       aes(x = mpg, y = disp, color = cyl, label = car)) + 
+       aes(x = mpg, y = disp, color = cyl, label = model)) + 
     geom_point(size = 4) +
     geom_text_repel(min.segment.length = 0, max.overlaps = Inf) + 
     scale_color_manual(values = c(`4` = "purple", `6` = "orange", 
