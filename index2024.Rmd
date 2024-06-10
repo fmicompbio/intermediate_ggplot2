@@ -18,17 +18,19 @@ that is needed is installed on the FMI RStudio servers:
 ```{r, eval = FALSE}
 pkgs <- c("knitr", "rmarkdown", "ggplot2", "tibble", "dplyr", "ragg", 
           "systemfonts", "sessioninfo", "ggExtra", "ggrepel", "scattermore",
-          "GGally", "cowplot", "tidyr", "scales", "ggh4x")
+          "GGally", "cowplot", "tidyr", "scales", "ggh4x", "ggtext", 
+          "fmicompbio/swissknife", "patchwork")
 install.packages("BiocManager")
 BiocManager::install(pkgs)
 ```
 
 
 * [Tips and tricks](https://fmicompbio.github.io/intermediate_ggplot2/intermediate_ggplot2.html)
-* [Scatterplots with *many* points](https://fmicompbio.github.io/intermediate_ggplot2/3_many_points_scatterplot.html)
-* [Pairwise scatter plots](https://fmicompbio.github.io/intermediate_ggplot2/4_ggpairs.html)
-* [Combining plots in a grid](https://fmicompbio.github.io/intermediate_ggplot2/5_combining_plot_panels.html)
+
 * [Legend placement](https://fmicompbio.github.io/intermediate_ggplot2/7_legend_placement.html)
 * [Label formatting](https://fmicompbio.github.io/intermediate_ggplot2/8_label_formatting.html)
+* [Scatterplots with *many* points](https://fmicompbio.github.io/intermediate_ggplot2/3_many_points_scatterplot.html)
+* [Combining plots in a grid](https://fmicompbio.github.io/intermediate_ggplot2/5_combining_plot_panels.html)
+* [Pairwise scatter plots](https://fmicompbio.github.io/intermediate_ggplot2/4_ggpairs.html)
 
 
