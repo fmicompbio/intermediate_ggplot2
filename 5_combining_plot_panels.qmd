@@ -84,6 +84,7 @@ into a format that can be understood by `cowplot`:
 
 ```{r}
 #| label: create-puppy-image
+#| code-fold: false
 
 ## Generate image object from jpg file
 img <- ggdraw() + 
@@ -127,19 +128,33 @@ plot_grid(jointtitle,
 
 ## Combine panels into final figure (patchwork)
 
-Here we create the same combined figure as above, but now using `patchwork` 
-rather than `cowplot`. 
+Here we create the same combined figure as above, but now using 
+`patchwork::wrap_plots` rather than `cowplot`. 
 
 ```{r}
-#| label: plot_combine_patchwork
+#| label: plot_combine_patchwork_wrap
 #| fig-width: 7
 #| fig-height: 7
 
 wrap_plots(p3, p1, img, p2, ncol = 2) + 
     plot_layout(widths = c(0.5, 1)) + 
     plot_annotation(tag_levels = list(c("A", "B", "", "C")), 
-                    title = "Combined plot title")
+                    title = "Combined plot title",
+                    theme = theme(plot.title = element_text(face = "bold")))
+```
 
+Here's another visualization, where the different rows distribute the plot 
+widths in different ways.
+
+```{r}
+#| label: plot_combine_patchwork
+#| fig-width: 7
+#| fig-height: 7
+
+(p3 + p1 + plot_layout(widths = c(1, 1))) / (img + p2 + plot_layout(widths = c(0.5, 1))) + 
+    plot_annotation(tag_levels = list(c("A", "B", "", "C")),
+                    title = "Combined plot title",
+                    theme = theme(plot.title = element_text(face = "bold")))
 ```
 
 ## Remarks
@@ -148,7 +163,7 @@ wrap_plots(p3, p1, img, p2, ncol = 2) +
 can extract it using `cowplot::get_legend()` and include it as a separate 
 panel (note that some 
 [issues](https://github.com/wilkelab/cowplot/issues/202) were reported with this 
-functionality starting with `ggplot2` 3.5.0.
+functionality starting with `ggplot2` 3.5.0).
 * To include `ggpairs` panels, see the tips [here](https://fmicompbio.github.io/intermediate_ggplot2_FMI2023/intermediate_ggplot2.html#combining-plot-panels).
 
 ## Session info
