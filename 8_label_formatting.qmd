@@ -141,6 +141,13 @@ ggplot(mycars,
     theme_bw(base_size = 13)
 ```
 
+## Resources
+
+* Some 
+[useful examples](https://coderclub.w.uib.no/2015/05/07/expressions-in-r/) of 
+using `expression` and `bquote` to add special characters to plot labels.
+Also see `?plotmath`.
+
 ## Session info
 
 ```{r}
