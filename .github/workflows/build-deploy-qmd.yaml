@@ -88,6 +88,8 @@ jobs:
           cp -r 4_ggpairs.html _site/
           cp -r 5_combining_plot_panels.html _site/
           cp -r 6_ppi_heatmaps.html _site/
+          cp -r 7_legend_placement.html _site/
+          cp -r 8_label_formatting.html _site/
 
       - name: Install deploy dependencies
         if: github.ref == 'refs/heads/main'
