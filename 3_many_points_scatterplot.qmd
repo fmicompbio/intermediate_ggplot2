@@ -65,12 +65,12 @@ leads to saturation and we do not see the full underlying density of data points
 #| code-fold: false
 
 # create base plot
-p0 <- ggplot(data = diamonds, mapping = aes(x = carat, y = price)) +
+gg <- ggplot(data = diamonds, mapping = aes(x = carat, y = price)) +
     labs(x = "Weight of the diamond (carat)", y = "Price (US dollars)") +
     theme_bw(20) +
     theme(panel.grid = element_blank(),
           legend.position = "bottom")
-p0 + geom_point()
+gg + geom_point()
 ```
 
 A simple way to improve the saturation issue is to use transparency, so that
@@ -83,7 +83,7 @@ solve the "many points" problem yet.
 #| fig-height: 7
 
 # ... with transparency
-p0 + geom_point(color = alpha("black", 0.02))
+gg + geom_point(color = alpha("black", 0.02))
 ```
 
 A simple way to solve also the "many points" problem is to avoid showing
@@ -96,14 +96,14 @@ using a color scale.
 #| fig-height: 7
 
 # ... with marginal density plots by number of cylinders
-p0 + geom_density_2d_filled(bins = 48) +
+gg + geom_density_2d_filled(bins = 48) +
     coord_cartesian(expand = FALSE) +
     theme(legend.position = "none")
 ```
 
 The linear contour levels or color intervals (controlled by `bins` or `breaks`)
 may not work well in a case like ours, where the density is very high in some
-regions that will occupy almost the complete color scale and we lose resoulution
+regions that will occupy almost the complete color scale and we lose resolution
 in low density regions. You can use `breaks` to create non-linear intervals
 (here combined with `ndensity` so that we know the range of densities: [0, 1])
 and with `theme(panel.background)` to make the zero-density area dark blue.
@@ -114,7 +114,7 @@ and with `theme(panel.background)` to make the zero-density area dark blue.
 #| fig-height: 7
 
 # ... with marginal density plots by number of cylinders
-p0 + geom_density_2d_filled(contour_var = "ndensity",
+gg + geom_density_2d_filled(contour_var = "ndensity",
                             breaks = exp(seq(log(1e-4), log(1), length.out = 64))) +
     coord_cartesian(expand = FALSE) +
     theme(legend.position = "none",
@@ -131,7 +131,7 @@ hard to use, `scattermore` provides a solution for that too.
 #| fig-height: 7
 
 # ... with marginal violin and labelled data points
-p0 + geom_scattermore(pointsize = 2, alpha = 0.02)
+gg + geom_scattermore(pointsize = 2, alpha = 0.02)
 ```
 
 
