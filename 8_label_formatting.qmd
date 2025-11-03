@@ -97,7 +97,8 @@ ggplot(mycars,
                        name = "Number of\ncylinders") + 
     labs(x = "_Miles/gallon_ (**mpg**)", y = "Displacement (in<sup>3</sup>)") + 
     theme_bw(base_size = 13) + 
-    theme(axis.title = element_markdown())
+    theme(axis.title.x.bottom = element_markdown(),
+          axis.title.y.left = element_markdown())
 ```
 
 ## Add special characters to labels

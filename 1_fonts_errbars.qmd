@@ -141,7 +141,7 @@ p0 +
                     mapping = aes(y = hp_avg,
                                 ymin = hp_avg - hp_sem,
                                 ymax = hp_avg + hp_sem),
-                    fatten = 6,
+                    size = 6,
                     color = "firebrick") +
     geom_point(mapping = aes(y = hp), shape = 1) +
     annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.1,
