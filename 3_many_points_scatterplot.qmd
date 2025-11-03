@@ -35,7 +35,7 @@ suppressPackageStartupMessages({
     library(tibble)
 })
 
-# built-in `dimanonds` dataset from the `ggplot2` package (see ?ggplot2::diamonds)
+# built-in `diamonds` dataset from the `ggplot2` package (see ?ggplot2::diamonds)
 tibble(diamonds)
 ```
 
