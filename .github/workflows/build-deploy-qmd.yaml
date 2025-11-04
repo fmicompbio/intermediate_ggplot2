@@ -53,7 +53,7 @@ jobs:
         run: |
           install.packages("BiocManager")
           BiocManager::install(c("quarto", "remotes", "scales", "forcats", 
-                                 "dplyr", "tidyr", "ggplot2", "thomasp85/ggforce", 
+                                 "dplyr", "tidyr", "ggplot2", "ggforce", 
                                  "hrbrmstr/ggalt", "ggridges", "GGally", "ggsignif", 
                                  "ggstatsplot", "gghighlight", "ggrepel", 
                                  "ggtext", "ggnewscale", "ggrastr", "patchwork", 
