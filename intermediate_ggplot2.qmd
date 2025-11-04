@@ -25,6 +25,9 @@ different aspects of adjusting `ggplot` objects.
 # Load packages
 
 ```{r}
+# check if problematic packages are available
+ggforce_available <- require(ggforce, quietly = TRUE)
+
 suppressPackageStartupMessages({
     ## data manipulation
     library(scales)
@@ -33,7 +36,9 @@ suppressPackageStartupMessages({
     library(tidyr)
     ## ggplot2 + extension packages
     library(ggplot2)
-    library(ggforce)
+    if (ggforce_available) {
+        library(ggforce)
+    }
     library(ggalt)
     library(ggridges)
     library(GGally)
@@ -320,6 +325,7 @@ Finally, the `facet_row` function from the `ggforce` package lets us adjust
 the space allocated to each facet and at the same time use a free y-axis.
 
 ```{r, fig.width = 10}
+#| eval: !expr ggforce_available
 ggplot(vehicles, aes(x = fct_lump_n(make, n = 3))) +
     geom_bar() + 
     facet_row(~ fct_lump_n(fuel, n = 3, other_level = "Other"), 
@@ -672,6 +678,7 @@ them in an ellipse (`ggforce::geom_mark_circle`) or a polygon
 (`ggalt::geom_encircle`):
 
 ```{r}
+#| eval: !expr ggforce_available
 ## ggforce
 ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
     geom_point() + 
@@ -680,7 +687,9 @@ ggplot(vehicles %>% dplyr::filter(year == 2005), aes(x = hwy, y = cty)) +
                           filter = (cty - hwy) > 1), 
                       fill = "pink") + 
     ggp
+```
 
+```{r}
 ## ggalt
 ggplot(iris, aes(x = Petal.Width, y = Sepal.Width, colour = Species)) +
     geom_point() + 
