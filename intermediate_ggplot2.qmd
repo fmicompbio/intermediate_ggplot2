@@ -27,6 +27,8 @@ different aspects of adjusting `ggplot` objects.
 ```{r}
 # check if problematic packages are available
 ggforce_available <- require(ggforce, quietly = TRUE)
+ggrastr_available <- require(ggrastr, quietly = TRUE)
+ggiraph_available <- require(ggiraph, quietly = TRUE)
 
 suppressPackageStartupMessages({
     ## data manipulation
@@ -48,7 +50,9 @@ suppressPackageStartupMessages({
     library(ggrepel)
     library(ggtext)
     library(ggnewscale)
-    library(ggrastr)
+    if (ggrastr_available) {
+        library(ggrastr)
+    }
     library(scattermore)
     library(directlabels)
     ## packages to combine multiple figures
@@ -56,7 +60,9 @@ suppressPackageStartupMessages({
     library(cowplot)
     ## packages for interactive graphics
     library(plotly)
-    library(ggiraph)
+    if (ggiraph_available) {
+        library(ggiraph)
+    }
     ## color packages
     library(RColorBrewer)
     library(circlize)
@@ -489,6 +495,7 @@ raster just the problematic layer, while keeping the remaining layers as vectors
 for example using the `geom_point_rast` function:
 
 ```{r, fig.width=9}
+#| eval: !expr ggrastr_available
 ## ggrastr::geom_*_rastr layers
 p1 <- ggplot(diamonds, aes(carat, price)) +
     geom_point_rast(size = 0.2, raster.dpi = 200) +
@@ -503,6 +510,7 @@ The resolution of the raster images can be controlled with `dpi` (or `raster.dpi
 above):
 
 ```{r, fig.width=9}
+#| eval: !expr ggrastr_available
 ## ggrastr::rasterise() wrapper
 ## ... around the whole plot
 p2 <- rasterise(p1, layers = c("Point", "Title")) # raster all layers of given types
@@ -629,6 +637,7 @@ Another option for making interactive graphs is to use the `ggiraph` package,
 which provides dedicated interactive layers. 
 
 ```{r}
+#| eval: !expr ggiraph_available
 girafe(ggobj = ggplot(vehicles) +
            geom_point_interactive(aes(x = hwy, y = cty,
                                       tooltip = make, data_id = make)) + 
